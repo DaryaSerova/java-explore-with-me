@@ -2,7 +2,6 @@ package ru.practicum.explore.event.jpa;
 
 import org.springframework.data.domain.Page;
 import ru.practicum.explore.event.StateEvent;
-import ru.practicum.explore.event.dto.EventFullDto;
 import ru.practicum.explore.event.model.Event;
 
 import java.util.List;
@@ -22,10 +21,10 @@ public interface EventPersistService {
 
     void saveEvent(Event event);
 
-    List<Event> findAllEventsWithCategories();
-
-    void deleteCategory(Long catId);
-
     Page<Event> getFullEvents(List<Long> users, List<StateEvent> states, List<Long> categories,
-                                     String rangeStart, String rangeEnd, int from, int size);
+                              String rangeStart, String rangeEnd, int from, int size);
+
+    Page<Event> getEventsPublic(String text, List<Long> categories, Boolean paid,
+                                String rangeStart, String rangeEnd, Boolean onlyAvailable,
+                                String sort, int from, int size);
 }

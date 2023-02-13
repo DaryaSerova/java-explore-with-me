@@ -5,16 +5,15 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.practicum.explore.category.dto.CategoryDto;
-import ru.practicum.explore.event.dto.EventDto;
-import ru.practicum.explore.event.dto.EventFullDto;
-import ru.practicum.explore.event.dto.EventShortDto;
-import ru.practicum.explore.event.dto.NewEventDto;
+import ru.practicum.explore.event.dto.*;
 import ru.practicum.explore.event.model.Event;
 import ru.practicum.explore.event.model.UpdateEventUserRequestDto;
 import ru.practicum.explore.location.dto.LocationDto;
+import ru.practicum.explore.location.mapper.LocationMapper;
 import ru.practicum.explore.user.dto.UserShortDto;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses = {LocationMapper.class})
 public interface EventMapper {
 
     Event toEvent(EventDto eventDto);
@@ -30,12 +29,12 @@ public interface EventMapper {
                                   UserShortDto initiator);
 
     @Mapping(target = "initiatorId", source = "userId")
+    @Mapping(target = "categoryId", source = "eventDto.category")
+    @Mapping(target = "location", source = "eventDto.location")
     Event toEventWithUserId(Long userId, NewEventDto eventDto);
 
     void mergeToEvent(UpdateEventUserRequestDto updateEventDto, @MappingTarget Event event);
 
+    void mergeToEventAdmin(UpdateEventAdminRequestDto updateEventAdminDto, @MappingTarget Event event);
 
 }
-//    @Mapping(target = "bookerId", source = "entity.booker.id")
-//    @Mapping(target = "itemId", source = "entity.item.id")
-//    BookingCreateDto toDto(Booking entity);

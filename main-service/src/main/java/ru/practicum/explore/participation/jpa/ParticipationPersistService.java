@@ -17,4 +17,6 @@ public interface ParticipationPersistService {
     Optional<ParticipationRequest> getEventParticipantsByUserId(Long userId);
 
     ParticipationRequest addParticipationRequest(ParticipationRequest participation);
+
+    ParticipationRequest findParticipationByRequesterIdAndEventId(Long userId, Long eventId);
 }

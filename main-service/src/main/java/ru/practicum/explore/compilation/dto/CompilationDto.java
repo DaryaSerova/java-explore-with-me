@@ -1,6 +1,10 @@
 package ru.practicum.explore.compilation.dto;
 
 import lombok.*;
+import ru.practicum.explore.event.dto.EventShortDto;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -10,11 +14,14 @@ import lombok.*;
 @Setter
 public class CompilationDto {
 
-    private Long eventId;
+    private List<EventShortDto> events;
 
+    @NotNull
     private Long id;
 
+    @NotNull
     private Boolean pinned;
 
+    @NotNull
     private String title;
 }

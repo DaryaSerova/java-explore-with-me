@@ -1,12 +1,12 @@
 package ru.practicum.explore.event.repository.specification;
 
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.CollectionUtils;
+
+import javax.persistence.metamodel.SingularAttribute;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.metamodel.SingularAttribute;
-
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.CollectionUtils;
 
 public class SpecificationUtils {
 
@@ -18,6 +18,12 @@ public class SpecificationUtils {
     public static <T, A> Specification<T> isEquals(SingularAttribute<T, A> attribute, A value) {
         return (root, query, builder) ->
                 value == null ? builder.conjunction() : builder.equal(root.get(attribute), value);
+    }
+
+    public static <T, A extends Comparable<? super A>> Specification<T> lessThan(
+            SingularAttribute<T, A> attribute1, SingularAttribute<T, A> attribute2) {
+        return (root, query, builder) ->
+                builder.lessThan(root.get(attribute1), root.get(attribute2));
     }
 
     public static <T, A, V> Specification<T> isEquals(
@@ -34,6 +40,14 @@ public class SpecificationUtils {
                 substring == null
                         ? builder.conjunction()
                         : builder.and(builder.like(root.get(attribute), "%" + substring + "%"));
+    }
+
+    public static <T> Specification<T> containsIgnoreCase(
+            SingularAttribute<T, String> attribute, String substring) {
+        return (root, query, builder) ->
+                substring == null
+                        ? builder.conjunction()
+                        : builder.and(builder.like(builder.lower(root.get(attribute)), "%" + substring.toLowerCase() + "%"));
     }
 
     public static <T> Specification<T> containsToString(

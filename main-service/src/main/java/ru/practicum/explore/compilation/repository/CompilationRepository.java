@@ -11,8 +11,8 @@ import ru.practicum.explore.compilation.model.Compilation;
 @Repository
 public interface CompilationRepository extends JpaRepository<Compilation, Long> {
 
-    @Query(value = "FROM Compilation as comp " +
-            "LEFT JOIN Event ev ON event_id = ev.id " +
-            "WHERE comp.pinned = :pinned ")
-    Page<Compilation> findAllCompilations(@Param("pinned") Boolean pinned, Pageable pageable);
+    @Query(value = "FROM Compilation as comp WHERE comp.pinned = :pinned ")
+    Page<Compilation> findAllCompilation(@Param("pinned") Boolean pinned, Pageable pageable);
+
+    Compilation findCompilationByTitle(String title);
 }

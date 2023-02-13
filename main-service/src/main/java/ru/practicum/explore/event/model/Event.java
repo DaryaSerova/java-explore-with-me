@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import ru.practicum.explore.event.StateEvent;
+import ru.practicum.explore.location.model.Location;
 
 import javax.persistence.*;
 import javax.validation.constraints.Future;
@@ -24,7 +25,6 @@ public class Event {
     @Length(max = 2000, min = 20)
     private String annotation;
 
-    @NotNull
     @JoinColumn(name = "category_id")
     private Long categoryId;
 
@@ -46,18 +46,18 @@ public class Event {
 
     private Long initiatorId;
 
-    @NotNull
-    private Long locationId;
+    @ManyToOne
+    private Location location;
 
-
-    private boolean paid;
+    private Boolean paid;
 
     private Integer participantLimit;
 
     private LocalDateTime publishedOn;
 
-    private boolean requestModeration;
+    private Boolean requestModeration;
 
+    @Enumerated(EnumType.STRING)
     private StateEvent state;
 
     @NotNull
@@ -65,4 +65,9 @@ public class Event {
     private String title;
 
     private Integer views;
+
+    @PrePersist
+    public void preInit() {
+        this.createdOn = LocalDateTime.now();
+    }
 }

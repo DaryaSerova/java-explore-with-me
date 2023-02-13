@@ -36,4 +36,9 @@ public class UserPersistServiceImpl implements UserPersistService {
     public Optional<User> findUserById(Long id) {
         return userRepository.findById(id);
     }
+
+    @Override
+    public List<User> findUsersByName(String name) {
+        return userRepository.findByName(name);
+    }
 }

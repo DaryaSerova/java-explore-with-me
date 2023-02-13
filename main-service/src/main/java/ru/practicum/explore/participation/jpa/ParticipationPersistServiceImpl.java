@@ -42,4 +42,9 @@ public class ParticipationPersistServiceImpl implements ParticipationPersistServ
     public ParticipationRequest addParticipationRequest(ParticipationRequest participation) {
         return participationRepository.save(participation);
     }
+
+    @Override
+    public ParticipationRequest findParticipationByRequesterIdAndEventId(Long requesterId, Long eventId) {
+        return participationRepository.findParticipationByRequesterIdAndEventId(requesterId, eventId);
+    }
 }

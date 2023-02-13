@@ -15,4 +15,6 @@ public interface UserPersistService {
     void deleteUserById(Long id);
 
     Optional<User> findUserById(Long id);
+
+    List<User> findUsersByName(String name);
 }

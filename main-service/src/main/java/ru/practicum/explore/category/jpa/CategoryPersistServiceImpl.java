@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.explore.category.dto.CategoryDto;
 import ru.practicum.explore.category.model.Category;
 import ru.practicum.explore.category.repository.CategoryRepository;
 
@@ -41,5 +40,10 @@ public class CategoryPersistServiceImpl implements CategoryPersistService {
     @Transactional
     public Category updateCategory(Category category) {
         return categoryRepository.save(category);
+    }
+
+    @Override
+    public void deleteCategory(Long catId) {
+        categoryRepository.deleteById(catId);
     }
 }

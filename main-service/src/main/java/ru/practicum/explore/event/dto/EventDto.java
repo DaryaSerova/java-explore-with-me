@@ -1,9 +1,15 @@
 package ru.practicum.explore.event.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.explore.event.StateEvent;
 
 import java.time.LocalDateTime;
@@ -24,6 +30,10 @@ public class EventDto {
 
     private String description;
 
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     private Long id;
@@ -32,13 +42,13 @@ public class EventDto {
 
     private Long locationId;
 
-    private boolean paid;
+    private Boolean paid;
 
     private Integer participantLimit;
 
     private LocalDateTime publishedOn;
 
-    private boolean requestModeration;
+    private Boolean requestModeration;
 
     private StateEvent state;
 

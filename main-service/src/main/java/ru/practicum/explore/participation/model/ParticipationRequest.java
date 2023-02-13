@@ -21,13 +21,14 @@ public class ParticipationRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime created;
+    private Long requesterId;
 
     private Long eventId;
 
-    private Long requesterId;
-
+    @Enumerated(EnumType.STRING)
     private ParticipationStatus status;
+
+    private LocalDateTime created;
 
     @PrePersist
     protected void onCreate() {

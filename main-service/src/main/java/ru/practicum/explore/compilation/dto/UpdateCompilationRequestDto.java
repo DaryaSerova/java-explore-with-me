@@ -2,7 +2,6 @@ package ru.practicum.explore.compilation.dto;
 
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -11,12 +10,11 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-public class NewCompilationDto {
+public class UpdateCompilationRequestDto {
 
     private List<Long> events;
 
     private Boolean pinned;
 
-    @NotNull
     private String title;
 }

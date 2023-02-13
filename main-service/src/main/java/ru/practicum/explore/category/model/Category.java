@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.explore.event.model.Event;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -22,4 +24,7 @@ public class Category {
 
     @NotNull
     private String name;
+
+    @OneToMany(mappedBy = "categoryId")
+    private List<Event> events;
 }

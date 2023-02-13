@@ -17,4 +17,9 @@ public class LocationPersistServiceImpl implements LocationPersistService {
     public Optional<Location> findLocationById(Long id) {
         return repository.findById(id);
     }
+
+    @Override
+    public Location save(Location location) {
+        return repository.save(location);
+    }
 }

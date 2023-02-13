@@ -3,7 +3,9 @@ package ru.practicum.explore.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import ru.practicum.explore.event.mapper.EventMapper;
+import ru.practicum.explore.exceptions.BadRequestException;
 import ru.practicum.explore.exceptions.ConflictException;
 import ru.practicum.explore.exceptions.NotFoundException;
 import ru.practicum.explore.user.dto.NewUserRequestDto;
@@ -46,6 +48,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(NewUserRequestDto newUserRequestDto) {
 
+
+        if (newUserRequestDto.getName() == null) {
+            throw new BadRequestException("Bad request body", "User name is empty");
+        }
+        var users = userPersistService.findUsersByName(newUserRequestDto.getName());
+        if (!CollectionUtils.isEmpty(users)) {
+            throw new ConflictException("Integrity constraint has been violated.", "User already exist ");
+        }
         var user = userMapper.toUser(newUserRequestDto);
 
         if (!emailPattern.matcher(user.getEmail()).matches()) {

@@ -1,7 +1,6 @@
 package ru.practicum.explore.category.jpa;
 
 import org.springframework.data.domain.Page;
-import ru.practicum.explore.category.dto.CategoryDto;
 import ru.practicum.explore.category.model.Category;
 
 import java.util.Optional;
@@ -17,4 +16,6 @@ public interface CategoryPersistService {
     Category addCategory(Category category);
 
     Category updateCategory(Category category);
+
+    void deleteCategory(Long catId);
 }

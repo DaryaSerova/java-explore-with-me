@@ -1,6 +1,5 @@
 package ru.practicum.explore.event.service;
 
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.practicum.explore.event.StateEvent;
 import ru.practicum.explore.event.dto.EventFullDto;
 import ru.practicum.explore.event.dto.EventShortDto;
@@ -27,7 +26,13 @@ public interface EventService {
 
     EventFullDto findEventById(Long eventId);
 
+    List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid,
+                                        String rangeStart, String rangeEnd, Boolean onlyAvailable,
+                                        String sort, int from, int size);
+
+    EventFullDto getEventPublicById(Long id);
+
     void increment(Long eventId);
 
-
+    void decrement(Long eventId);
 }

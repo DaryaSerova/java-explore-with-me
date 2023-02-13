@@ -88,9 +88,18 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/requests")
+    @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addParticipationRequest(@PathVariable("userId") Long userId,
                                                            @RequestParam Long eventId) {
         log.info("Запрос на добавление запроса от текущего пользователя с id " + userId + " на участие в событии");
         return participationService.addParticipationRequest(userId, eventId);
     }
+
+    @PatchMapping("/{userId}/requests/{requestId}/cancel")
+    public ParticipationRequestDto cancelRequest(@PathVariable("userId") Long userId,
+                                                 @PathVariable("requestId") Long requestId) {
+        log.info("Отмена запроса на участие в событии c id " + requestId + " пользователя с id " + userId);
+        return participationService.cancelRequest(userId, requestId);
+    }
+
 }

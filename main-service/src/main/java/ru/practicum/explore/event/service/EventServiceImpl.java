@@ -2,6 +2,7 @@ package ru.practicum.explore.event.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.explore.admin.StateAction;
 import ru.practicum.explore.category.service.CategoryService;
 import ru.practicum.explore.event.StateEvent;
 import ru.practicum.explore.event.dto.EventFullDto;
@@ -10,16 +11,15 @@ import ru.practicum.explore.event.dto.NewEventDto;
 import ru.practicum.explore.event.dto.UpdateEventAdminRequestDto;
 import ru.practicum.explore.event.jpa.EventPersistService;
 import ru.practicum.explore.event.mapper.EventMapper;
+import ru.practicum.explore.event.model.Event;
 import ru.practicum.explore.event.model.UpdateEventUserRequestDto;
-import ru.practicum.explore.exceptions.ForbiddenException;
+import ru.practicum.explore.exceptions.BadRequestException;
+import ru.practicum.explore.exceptions.ConflictException;
 import ru.practicum.explore.exceptions.NotFoundException;
 import ru.practicum.explore.location.service.LocationService;
 import ru.practicum.explore.user.service.UserService;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,11 +54,15 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto createEvent(Long userId, NewEventDto eventDto) {
-
+        if (eventDto.getAnnotation() == null) {
+            throw new BadRequestException("Bad request body", "Event annotation is empty");
+        }
+        var location = locationService.save(eventDto.getLocation());
+        eventDto.setLocation(location);
         var event = eventMapper.toEventWithUserId(userId, eventDto);
 
         if (!event.getEventDate().isAfter(LocalDateTime.now().plusHours(2))) {
-            throw new ForbiddenException("For the requested operation the conditions are not met.",
+            throw new ConflictException("For the requested operation the conditions are not met.",
                     "Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value: " +
                             event.getEventDate());
         }
@@ -68,7 +72,6 @@ public class EventServiceImpl implements EventService {
 
         var category = categoryService.getCategoryById(event.getCategoryId());
         var user = userService.getUserShortById(event.getInitiatorId());
-        var location = locationService.getLocationById(event.getLocationId());
 
         return eventMapper.toFullEventDto(event, category, user, location);
 
@@ -80,12 +83,13 @@ public class EventServiceImpl implements EventService {
         var event = eventPersistService.findUserEventById(userId, eventId);
 
         if (event == null) {
-            throw new NotFoundException("The required object was not found.", "Event with %id was not found" + eventId);
+            throw new NotFoundException("The required object was not found.",
+                    "Event with %id was not found" + eventId);
         }
 
         var category = categoryService.getCategoryById(event.getCategoryId());
         var user = userService.getUserShortById(event.getInitiatorId());
-        var location = locationService.getLocationById(event.getLocationId());
+        var location = locationService.getLocationById(event.getLocation().getId());
 
         return eventMapper.toFullEventDto(event, category, user, location);
     }
@@ -95,10 +99,10 @@ public class EventServiceImpl implements EventService {
 
         var event = eventPersistService.findUserEventById(userId, eventId);
         var stateEvent = event.getState();
-        var eventDate = updateEventDto.getEventDate();
+        var updateEventDate = updateEventDto.getEventDate();
 
         if (stateEvent.equals(StateEvent.PUBLISHED)) {
-            throw new ForbiddenException("For the requested operation the conditions are not met.",
+            throw new ConflictException("For the requested operation the conditions are not met.",
                     "Only pending or canceled events can be changed");
         }
 
@@ -107,17 +111,18 @@ public class EventServiceImpl implements EventService {
                     "Event with %id was not found " + eventId);
         }
 
-        if (!eventDate.isAfter(LocalDateTime.now().plusHours(2))) {
-            throw new ForbiddenException("For the requested operation the conditions are not met.",
-                    "Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value: " + eventDate);
+        if (updateEventDate != null && !updateEventDate.isAfter(LocalDateTime.now().plusHours(2))) {
+            throw new ConflictException("For the requested operation the conditions are not met.",
+                    "Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value: " + updateEventDate);
         }
 
         eventMapper.mergeToEvent(updateEventDto, event);
+        event.setState(getStateEvent(event, updateEventDto.getStateAction()));
         event.setInitiatorId(userId);
 
         var category = categoryService.getCategoryById(event.getCategoryId());
         var user = userService.getUserShortById(event.getInitiatorId());
-        var location = locationService.getLocationById(event.getLocationId());
+        var location = locationService.getLocationById(event.getLocation().getId());
 
         var resultEvent = eventMapper.toFullEventDto(
                 eventPersistService.updateEvent(event), category, user, location);
@@ -139,7 +144,7 @@ public class EventServiceImpl implements EventService {
                 .map(event -> {
                     var category = categoryService.getCategoryById(event.getCategoryId());
                     var user = userService.getUserShortById(event.getInitiatorId());
-                    var location = locationService.getLocationById(event.getLocationId());
+                    var location = locationService.getLocationById(event.getLocation().getId());
                     return eventMapper.toFullEventDto(event, category, user, location);
                 }).collect(Collectors.toList());
     }
@@ -148,31 +153,93 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateEventByAdmin(UpdateEventAdminRequestDto updateEventDto, Long eventId) {
 
         var event = eventPersistService.findEventById(eventId).get();
-        var eventDate = updateEventDto.getEventDate();
+
+        if (event == null) {
+            throw new NotFoundException("The required object was not found.",
+                    String.format("Event with %s was not found", eventId));
+        }
+
+        var eventUpdateDate = updateEventDto.getEventDate();
         var createdOn = event.getCreatedOn();
-        var stateEvent = event.getState();
 
-        LocalDateTime startUpdateEvent = LocalDateTime.parse(
-                URLDecoder.decode(String.valueOf(eventDate), StandardCharsets.UTF_8),
-                DateTimeFormatter.ofPattern(("yyyy-MM-dd HH:mm:ss")));
-
-
-        if (!startUpdateEvent.isAfter(createdOn.plusHours(1))) {
-            throw new ForbiddenException("For the requested operation the conditions are not met.",
+        if (eventUpdateDate != null && !eventUpdateDate.isAfter(createdOn.plusHours(1))) {
+            throw new ConflictException("For the requested operation the conditions are not met.",
                     "Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value: " + createdOn);
         }
 
+        if (updateEventDto.getStateAction().equals(StateAction.PUBLISH_EVENT)) {
 
-        return null;
+            if (event.getState().equals(StateEvent.PUBLISHED) || event.getState().equals(StateEvent.CANCELED)) {
+                throw new ConflictException("For the requested operation the conditions are not met.",
+                        "Cannot publish the event because it's not in the right state: PUBLISHED");
+            }
+            eventMapper.mergeToEventAdmin(updateEventDto, event);
+            event.setState(StateEvent.PUBLISHED);
+
+            var category = categoryService.getCategoryById(event.getCategoryId());
+            var user = userService.getUserShortById(event.getInitiatorId());
+            var location = locationService.getLocationById(event.getLocation().getId());
+
+            var resultEvent = eventMapper.toFullEventDto(eventPersistService.updateEvent(event),
+                    category, user, location);
+
+            return resultEvent;
+        }
+
+        if (updateEventDto.getStateAction().equals(StateAction.REJECT_EVENT)) {
+            if (event.getState().equals(StateEvent.PUBLISHED)) {
+                throw new ConflictException("For the requested operation the conditions are not met.",
+                        "Cannot publish the event because it's not in the right state: PUBLISHED");
+            }
+            eventMapper.mergeToEventAdmin(updateEventDto, event);
+            event.setState(StateEvent.CANCELED);
+
+            var category = categoryService.getCategoryById(event.getCategoryId());
+            var user = userService.getUserShortById(event.getInitiatorId());
+            var location = locationService.getLocationById(event.getLocation().getId());
+
+            var resultEvent = eventMapper.toFullEventDto(eventPersistService.updateEvent(event),
+                    category, user, location);
+
+            return resultEvent;
+        }
+
+        throw new ConflictException("For the requested operation the conditions are not met.",
+                "Cannot publish the event because it's not in the right state: PUBLISHED");
+
     }
 
     @Override
-    public void increment(Long eventId) {
+    public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid,
+                                               String rangeStart, String rangeEnd, Boolean onlyAvailable,
+                                               String sort, int from, int size) {
 
-        var event = eventPersistService.findEventById(eventId).get();
+        var eventsPublic = eventPersistService.getEventsPublic(text, categories, paid, rangeStart,
+                rangeEnd, onlyAvailable, sort, from, size).getContent();
 
-        event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-        eventPersistService.saveEvent(event);
+        if (eventsPublic.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return eventsPublic.stream()
+                .map(event -> {
+                    var category = categoryService.getCategoryById(event.getCategoryId());
+                    var user = userService.getUserShortById(event.getInitiatorId());
+                    return eventMapper.toEventShortDto(event, category, user);
+                }).collect(Collectors.toList());
+    }
+
+    @Override
+    public EventFullDto getEventPublicById(Long id) {
+
+        var event = findEventById(id);
+        if (event == null) {
+            throw new NotFoundException("The required object was not found.", "Event with %id was not found" + id);
+        }
+        if (!event.getState().equals(StateEvent.PUBLISHED)) {
+            return null;
+        }
+        return event;
     }
 
     @Override
@@ -182,9 +249,51 @@ public class EventServiceImpl implements EventService {
 
         var category = categoryService.getCategoryById(event.getCategoryId());
         var user = userService.getUserShortById(event.getInitiatorId());
-        var location = locationService.getLocationById(event.getLocationId());
+        var location = locationService.getLocationById(event.getLocation().getId());
 
         return eventMapper.toFullEventDto(event, category, user, location);
+
+    }
+
+    @Override
+    public void increment(Long eventId) {
+
+        var event = eventPersistService.findEventById(eventId).get();
+        var confirmedRequests =
+                event.getConfirmedRequests() == null ||
+                        event.getConfirmedRequests() == 0 ? 1
+                        : event.getConfirmedRequests() + 1;
+        event.setConfirmedRequests(confirmedRequests);
+        eventPersistService.saveEvent(event);
+    }
+
+    @Override
+    public void decrement(Long eventId) {
+
+        var event = eventPersistService.findEventById(eventId).get();
+
+        var confirmedRequests =
+                event.getConfirmedRequests() == null ||
+                        event.getConfirmedRequests() == 0 ? 0
+                        : event.getConfirmedRequests() - 1;
+        event.setConfirmedRequests(confirmedRequests);
+        eventPersistService.saveEvent(event);
+    }
+
+
+    private StateEvent getStateEvent(Event event, StateAction stateAction) {
+
+        switch (stateAction) {
+            case CANCEL_REVIEW:
+                return StateEvent.CANCELED;
+            case PUBLISH_EVENT:
+                return StateEvent.PUBLISHED;
+            case SEND_TO_REVIEW:
+                return StateEvent.PENDING;
+            default:
+                return event.getState();
+
+        }
 
     }
 

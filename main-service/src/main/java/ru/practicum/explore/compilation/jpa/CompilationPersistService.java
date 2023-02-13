@@ -10,4 +10,12 @@ public interface CompilationPersistService {
     Page<Compilation> findCompilation(Boolean pinned, Integer from, Integer size);
 
     Optional<Compilation> findCompilationById(Long compId);
+
+    Compilation addCompilation(Compilation compilation);
+
+    Compilation findCompilationByTitle(String title);
+
+    void deleteCompilation(Long compId);
+
+    Compilation updateCompilation(Compilation compilation);
 }

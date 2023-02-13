@@ -18,11 +18,34 @@ public class CompilationPersistServiceImpl implements CompilationPersistService 
 
     @Override
     public Page<Compilation> findCompilation(Boolean pinned, Integer from, Integer size) {
-        return compilationRepository.findAllCompilations(pinned, PageRequest.of(from, size));
+        return compilationRepository.findAllCompilation(pinned, PageRequest.of(from, size));
     }
 
     @Override
     public Optional<Compilation> findCompilationById(Long compId) {
         return compilationRepository.findById(compId);
+    }
+
+    @Override
+    @Transactional
+    public Compilation addCompilation(Compilation compilation) {
+        return compilationRepository.save(compilation);
+    }
+
+    @Override
+    public Compilation findCompilationByTitle(String title) {
+        return compilationRepository.findCompilationByTitle(title);
+    }
+
+    @Override
+    @Transactional
+    public void deleteCompilation(Long compId) {
+        compilationRepository.deleteById(compId);
+    }
+
+    @Override
+    @Transactional
+    public Compilation updateCompilation(Compilation compilation) {
+        return compilationRepository.save(compilation);
     }
 }

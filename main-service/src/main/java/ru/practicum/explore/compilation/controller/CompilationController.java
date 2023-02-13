@@ -14,22 +14,22 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @RestController
-@RequestMapping("/compilations")
+@RequestMapping("/")
 public class CompilationController {
 
     private final CompilationService compilationService;
 
-    @GetMapping
-    public List<CompilationDto> getCompilation(@RequestParam Boolean pinned,
+    @GetMapping("compilations")
+    public List<CompilationDto> getCompilation(@RequestParam(required = false) Boolean pinned,
                                                @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
                                                @RequestParam(defaultValue = "10") @PositiveOrZero Integer size) {
 
-        log.info("Запрос на получение подборок событий.");
+        log.info("Получение подборок событий.");
 
         return compilationService.getCompilation(pinned, from, size);
     }
 
-    @GetMapping("/{compId}")
+    @GetMapping("compilations/{compId}")
     public CompilationDto getCompilationById(@PathVariable("compId") Long compId) {
 
         log.info("Запрос на получение подборки событий с id " + compId);

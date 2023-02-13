@@ -1,8 +1,9 @@
 package ru.practicum.explore.client;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.practicum.explore.dto.EndpointHitDto;
@@ -12,7 +13,8 @@ import java.util.Collections;
 import java.util.List;
 
 
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Service
 public class StatsClient {
 
     private final WebClient webClient;
