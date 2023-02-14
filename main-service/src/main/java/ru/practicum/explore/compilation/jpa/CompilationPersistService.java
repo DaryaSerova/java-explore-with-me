@@ -13,7 +13,7 @@ public interface CompilationPersistService {
 
     Compilation addCompilation(Compilation compilation);
 
-    Compilation findCompilationByTitle(String title);
+    Optional<Compilation> findCompilationByTitle(String title);
 
     void deleteCompilation(Long compId);
 

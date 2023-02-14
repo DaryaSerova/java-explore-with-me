@@ -3,6 +3,7 @@ package ru.practicum.explore.client;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -15,10 +16,9 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class WebClientConfig {
     public static final int TIMEOUT = 1000;
-    public static final String STAT_URL = "http://localhost:9090";
 
     @Bean
-    public WebClient webClientWithTimeout() {
+    public WebClient webClientWithTimeout(@Value("${stats-server.url}") String serverUrl) {
         final var tcpClient = TcpClient
                 .create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT)
@@ -28,7 +28,7 @@ public class WebClientConfig {
                 });
 
         return WebClient.builder()
-                .baseUrl(STAT_URL)
+                .baseUrl(serverUrl)
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))
                 .build();
     }

@@ -4,29 +4,26 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explore.client.StatsClient;
-import ru.practicum.explore.dto.EndpointHitDto;
 import ru.practicum.explore.event.dto.EventFullDto;
 import ru.practicum.explore.event.dto.EventShortDto;
 import ru.practicum.explore.event.service.EventService;
+import ru.practicum.explore.statistic.StatisticService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.PositiveOrZero;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
 @RestController
 @Validated
 @RequiredArgsConstructor
-@RequestMapping(path = "/events")
+@RequestMapping(path = "/")
 public class EventController {
 
     private final EventService eventService;
+    private final StatisticService statisticService;
 
-    private final StatsClient client;
-
-    @GetMapping
+    @GetMapping("events")
     public List<EventShortDto> getEventsPublic(@RequestParam(required = false) String text,
                                                @RequestParam(required = false) List<Long> categories,
                                                @RequestParam(required = false) Boolean paid,
@@ -41,12 +38,7 @@ public class EventController {
                                                @PositiveOrZero int size,
                                                HttpServletRequest request) {
 
-        EndpointHitDto hitDto = new EndpointHitDto();
-        hitDto.setApp("main-service");
-        hitDto.setIp(request.getRemoteAddr());
-        hitDto.setUri(request.getRequestURI());
-        hitDto.setTimestamp(LocalDateTime.now());
-        client.addHit(hitDto);
+        statisticService.addHit(request);
 
         log.info("Получение опубликованных событий.");
         return eventService.getEventsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort,
@@ -54,15 +46,10 @@ public class EventController {
 
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("events/{id}")
     public EventFullDto getEventPublicById(@PathVariable(name = "id") Long id, HttpServletRequest request) {
 
-        EndpointHitDto hitDto = new EndpointHitDto();
-        hitDto.setApp("main-service");
-        hitDto.setIp(request.getRemoteAddr());
-        hitDto.setUri(request.getRequestURI());
-        hitDto.setTimestamp(LocalDateTime.now());
-        client.addHit(hitDto);
+        statisticService.addHit(request);
 
         log.info("Получение информации о событий с id = " + id);
         return eventService.getEventPublicById(id);

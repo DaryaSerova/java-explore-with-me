@@ -52,7 +52,7 @@ public class CompilationServiceImpl implements CompilationService {
         var compilation = compilationPersistService.findCompilationById(compId);
         if (compilation == null || compilation.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Compilation with %s was not found", compId));
+                          String.format("Compilation with id = %compId was not found", compId));
         }
 
         var events = compilation.get().getEvents()
@@ -78,7 +78,7 @@ public class CompilationServiceImpl implements CompilationService {
 
         var comp = compilationPersistService.findCompilationByTitle(newCompilationDto.getTitle());
 
-        if (comp != null && newCompilationDto.getTitle().equals(comp)) {
+        if (comp.isPresent() && newCompilationDto.getTitle().equals(comp.get().getTitle())) {
             throw new ConflictException("Integrity constraint has been violated.",
                                         "could not execute statement; SQL [n/a]; constraint [uq_compilation_title]; " +
                                         "nested exception is org.hibernate.exception.ConstraintViolationException: " +
@@ -119,7 +119,7 @@ public class CompilationServiceImpl implements CompilationService {
 
         if (comp == null) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Compilation with %s was not found", compId));
+                          String.format("Compilation with id = %compId was not found", compId));
         }
 
         var events = updateCompilationDto.getEvents()

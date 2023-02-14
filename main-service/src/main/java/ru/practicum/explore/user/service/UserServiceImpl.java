@@ -60,9 +60,9 @@ public class UserServiceImpl implements UserService {
 
         if (!emailPattern.matcher(user.getEmail()).matches()) {
             throw new ConflictException("Integrity constraint has been violated.",
-                    "could not execute statement; SQL [n/a]; constraint [uq_email]; " +
-                            "nested exception is org.hibernate.exception.ConstraintViolationException: " +
-                            "could not execute statement");
+                                        "could not execute statement; SQL [n/a]; constraint [uq_email]; " +
+                                        "nested exception is org.hibernate.exception.ConstraintViolationException: " +
+                                        "could not execute statement");
         }
 
         userPersistService.createUser(user);
@@ -75,11 +75,8 @@ public class UserServiceImpl implements UserService {
 
         getUserShortById(id);
 
-        log.debug("User with id {} was found", id);
-
         userPersistService.deleteUserById(id);
 
-        log.debug("User with id {} was deleted", id);
     }
 
     public UserShortDto getUserShortById(Long id) {
@@ -87,7 +84,8 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userPersistService.findUserById(id);
 
         if (user.isEmpty()) {
-            throw new NotFoundException("The required object was not found.", "User with %id was not found." + id);
+            throw new NotFoundException("The required object was not found.",
+                          String.format("User with id = %id was not found.", id));
         }
 
         return userMapper.toUserShortDto(user.get());

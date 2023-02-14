@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explore.event.dto.EventFullDto;
 import ru.practicum.explore.event.dto.EventShortDto;
 import ru.practicum.explore.event.dto.NewEventDto;
-import ru.practicum.explore.event.model.UpdateEventUserRequestDto;
+import ru.practicum.explore.event.dto.UpdateEventUserRequestDto;
 import ru.practicum.explore.event.service.EventService;
 import ru.practicum.explore.participation.dto.EventRequestStatusUpdateRequestDto;
 import ru.practicum.explore.participation.dto.EventRequestStatusUpdateResultDto;
@@ -82,7 +82,7 @@ public class UserController {
 
     @GetMapping("/{userId}/requests")
     public List<ParticipationRequestDto> getUserRequests(@PathVariable("userId") Long userId) {
-        log.info("Запрос на получение информации о заявках пользователя с id " + userId +
+        log.info("Получение информации о заявках пользователя с id " + userId +
                 " на участие в чужих событиях");
         return participationService.getUserParticipantsRequests(userId);
     }
@@ -91,7 +91,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addParticipationRequest(@PathVariable("userId") Long userId,
                                                            @RequestParam Long eventId) {
-        log.info("Запрос на добавление запроса от текущего пользователя с id " + userId + " на участие в событии");
+        log.info("Добавление запроса от текущего пользователя с id " + userId + " на участие в событии");
         return participationService.addParticipationRequest(userId, eventId);
     }
 

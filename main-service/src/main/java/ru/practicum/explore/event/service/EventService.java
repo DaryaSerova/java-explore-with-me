@@ -5,7 +5,7 @@ import ru.practicum.explore.event.dto.EventFullDto;
 import ru.practicum.explore.event.dto.EventShortDto;
 import ru.practicum.explore.event.dto.NewEventDto;
 import ru.practicum.explore.event.dto.UpdateEventAdminRequestDto;
-import ru.practicum.explore.event.model.UpdateEventUserRequestDto;
+import ru.practicum.explore.event.dto.UpdateEventUserRequestDto;
 
 import java.util.List;
 

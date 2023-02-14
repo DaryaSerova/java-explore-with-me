@@ -7,6 +7,5 @@ import java.util.Optional;
 public interface LocationPersistService {
     Optional<Location> findLocationById(Long id);
 
-
     Location save(Location location);
 }

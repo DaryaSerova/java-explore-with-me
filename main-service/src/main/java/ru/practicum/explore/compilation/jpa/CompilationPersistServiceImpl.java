@@ -33,7 +33,7 @@ public class CompilationPersistServiceImpl implements CompilationPersistService 
     }
 
     @Override
-    public Compilation findCompilationByTitle(String title) {
+    public Optional<Compilation> findCompilationByTitle(String title) {
         return compilationRepository.findCompilationByTitle(title);
     }
 

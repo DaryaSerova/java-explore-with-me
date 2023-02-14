@@ -52,8 +52,7 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         if (event.getConfirmedRequests() != null && event.getConfirmedRequests().equals(event.getParticipantLimit())) {
             throw new ConflictException("For the requested operation the conditions are not met.",
-                    "The participant limit has been reached");
-            //нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие (Ожидается код ошибки 409)
+                                        "The participant limit has been reached");
         }
 
         var result = new EventRequestStatusUpdateResultDto();
@@ -64,7 +63,7 @@ public class ParticipationServiceImpl implements ParticipationService {
             if (requestOpt.isPresent()) {
                 var request = requestOpt.get();
 
-                if (request.getStatus() != PENDING) { //статус можно изменить только у заявок, находящихся в состоянии ожидания
+                if (request.getStatus() != PENDING) {
                     throw new BadRequestException("Incorrectly made request.", "Request must have status PENDING");
                 }
 
@@ -114,9 +113,9 @@ public class ParticipationServiceImpl implements ParticipationService {
                 participation.getRequesterId().equals(userId)
                 && participation.getEventId().equals(eventId)) {
             throw new ConflictException("Integrity constraint has been violated.",
-                    "could not execute statement; SQL [n/a]; constraint [uq_request]; " +
-                            "nested exception is org.hibernate.exception.ConstraintViolationException: " +
-                            "could not execute statement");
+                                        "could not execute statement; SQL [n/a]; constraint [uq_request]; " +
+                                        "nested exception is org.hibernate.exception.ConstraintViolationException: " +
+                                        "could not execute statement");
         }
 
         var event = eventService.findEventById(eventId);
@@ -124,15 +123,15 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         if (event.getInitiator().getId().equals(userId) || !event.getState().equals(StateEvent.PUBLISHED)) {
             throw new ConflictException("Integrity constraint has been violated.",
-                    "could not execute statement; SQL [n/a]; constraint [uq_request]; " +
-                            "nested exception is org.hibernate.exception.ConstraintViolationException: " +
-                            "could not execute statement");
+                                        "could not execute statement; SQL [n/a]; constraint [uq_request]; " +
+                                        "nested exception is org.hibernate.exception.ConstraintViolationException: " +
+                                        "could not execute statement");
         }
 
         if (event.getConfirmedRequests() != null &&
                 event.getConfirmedRequests().equals(event.getParticipantLimit())) {
             throw new ConflictException("For the requested operation the conditions are not met.",
-                    "The participant limit has been reached");
+                                        "The participant limit has been reached");
         }
 
         ParticipationRequest newParticipation = new ParticipationRequest();
@@ -147,7 +146,6 @@ public class ParticipationServiceImpl implements ParticipationService {
             newParticipation.setStatus(ParticipationStatus.PENDING);
         }
 
-
         return participationMapper.map(participationPersistService.addParticipationRequest(newParticipation));
 
     }
@@ -159,7 +157,7 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         if (request == null) {
             throw new NotFoundException("The required object was not found.",
-                    "Event with %id was not found" + requestId);
+                          String.format("Request with id = %requestId was not found", requestId));
         }
 
         request.setStatus(ParticipationStatus.CANCELED);
@@ -179,11 +177,13 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         var event = eventService.getUserEventById(userId, eventId);
 
-        if (event.getParticipantLimit() == 0 || (event.getRequestModeration() != null && !event.getRequestModeration())) {
+        if (event.getParticipantLimit() == 0 ||
+                (event.getRequestModeration() != null && !event.getRequestModeration())) {
             return CONFIRMED;
         }
 
-        if (event.getConfirmedRequests() != null && event.getConfirmedRequests().equals(event.getParticipantLimit())) {
+        if (event.getConfirmedRequests() != null &&
+                event.getConfirmedRequests().equals(event.getParticipantLimit())) {
             return ParticipationStatus.REJECTED;
         }
         return CONFIRMED;

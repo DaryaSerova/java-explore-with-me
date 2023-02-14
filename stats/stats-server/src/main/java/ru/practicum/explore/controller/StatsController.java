@@ -20,7 +20,7 @@ public class StatsController {
     private final StatService statService;
 
     @PostMapping(value = "hit")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public EndpointHitDto createHit(@RequestBody EndpointHitDto endpointHitDto) {
         log.info("Запрос к " + endpointHitDto.getApp() + " сохранен.");
         return statService.addHit(endpointHitDto);

@@ -39,7 +39,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/explore-with-me-main
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=root
-      - SERVICES_STATSSERVICE_URI=http://stats-server:9090
+      - STATS_SERVICE_URL=http://stats-server:9090
       - JAVA_OPTS=-Djdk.httpclient.WebClient.log=errors,requests
 
   ewm-db:

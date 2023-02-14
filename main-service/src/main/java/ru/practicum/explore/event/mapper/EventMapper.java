@@ -7,7 +7,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.practicum.explore.category.dto.CategoryDto;
 import ru.practicum.explore.event.dto.*;
 import ru.practicum.explore.event.model.Event;
-import ru.practicum.explore.event.model.UpdateEventUserRequestDto;
+import ru.practicum.explore.event.dto.UpdateEventUserRequestDto;
 import ru.practicum.explore.location.dto.LocationDto;
 import ru.practicum.explore.location.mapper.LocationMapper;
 import ru.practicum.explore.user.dto.UserShortDto;

@@ -1,4 +1,4 @@
-package ru.practicum.explore.event.model;
+package ru.practicum.explore.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

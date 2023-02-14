@@ -9,7 +9,6 @@ import ru.practicum.explore.participation.model.ParticipationRequest;
 @Mapper(componentModel = "spring")
 public interface ParticipationMapper {
 
-
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "event", source = "eventId")
     @Mapping(target = "requester", source = "requesterId")
