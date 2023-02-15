@@ -20,7 +20,7 @@ public class StatsController {
     private final StatService statService;
 
     @PostMapping(value = "hit")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public EndpointHitDto createHit(@RequestBody EndpointHitDto endpointHitDto) {
         log.info("Запрос к " + endpointHitDto.getApp() + " сохранен.");
         return statService.addHit(endpointHitDto);
@@ -30,7 +30,7 @@ public class StatsController {
     public List<ViewStatsDto> getViewStats(@RequestParam String start,
                                            @RequestParam String end,
                                            @RequestParam List<String> uris,
-                                           @RequestParam (required = false) boolean unique) {
+                                           @RequestParam(required = false) boolean unique) {
         log.info("Получение статистики по посещениям.");
         return statService.getStatistics(start, end, uris, unique);
 
