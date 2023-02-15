@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explore.comment.dto.CommentDto;
+import ru.practicum.explore.comment.dto.NewCommentDto;
+import ru.practicum.explore.comment.service.CommentService;
 import ru.practicum.explore.event.dto.EventFullDto;
 import ru.practicum.explore.event.dto.EventShortDto;
 import ru.practicum.explore.event.dto.NewEventDto;
@@ -27,6 +30,7 @@ public class UserController {
 
     private final EventService eventService;
     private final ParticipationService participationService;
+    private final CommentService commentService;
 
     @GetMapping("/{userId}/events")
     public List<EventShortDto> getUserEvents(@PathVariable("userId") Long userId,
@@ -102,4 +106,22 @@ public class UserController {
         return participationService.cancelRequest(userId, requestId);
     }
 
+    @PostMapping("/{userId}/events/{eventId}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto addComment(@PathVariable("userId") Long userId,
+                                 @PathVariable("eventId") Long eventId,
+                                 @RequestBody NewCommentDto newCommentDto) {
+        log.info("Добавление комментария от текущего пользователя с id " + userId + " к событию с id " + eventId);
+        return commentService.addComment(userId, eventId, newCommentDto);
+    }
+
+    @DeleteMapping("/{userId}/events/{eventId}/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(@PathVariable("userId") Long userId,
+                                    @PathVariable("eventId") Long eventId,
+                                    @PathVariable("commentId") Long commentId) {
+        log.info("Удаление не опубликованного комментария от текущего пользователя с id " + userId +
+                 " к событию с id " + eventId);
+        commentService.deleteComment(userId, eventId, commentId);
+    }
 }
