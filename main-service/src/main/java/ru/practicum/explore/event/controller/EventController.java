@@ -40,6 +40,8 @@ public class EventController {
                                                @PositiveOrZero int size,
                                                HttpServletRequest request) {
 
+        statisticService.addHit(request);
+
         log.info("Получение опубликованных событий.");
         return eventService.getEventsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort,
                 from, size);
@@ -48,6 +50,8 @@ public class EventController {
 
     @GetMapping("events/{id}")
     public EventFullDto getEventPublicById(@PathVariable(name = "id") Long id, HttpServletRequest request) {
+
+        statisticService.addHit(request);
 
         log.info("Получение информации о событий с id = " + id);
         return eventService.getEventPublicById(id);
