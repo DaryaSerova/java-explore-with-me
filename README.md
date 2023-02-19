@@ -81,7 +81,14 @@ Explore with me (англ. «исследуй со мной») - это афиш
   происходит при помощи клиента статистики (stat-client).
   
   Диаграмма БД основного сервиса
+  
+  
   ![](https://github.com/DaryaSerova/java-explore-with-me/blob/feature_comments/db%20-%20explore%20with%20me%20-%20main%20service.png)
 
   Диаграмма БД сервиса статистики
+  
+  
   ![](https://github.com/DaryaSerova/java-explore-with-me/blob/feature_comments/db%20-%20explore%20with%20me%20-%20statistic%20service.png)
+  
+  
+  PR feature https://github.com/DaryaSerova/java-explore-with-me/pull/3
