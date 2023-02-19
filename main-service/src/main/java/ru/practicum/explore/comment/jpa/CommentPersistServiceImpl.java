@@ -26,7 +26,7 @@ public class CommentPersistServiceImpl implements CommentPersistService {
 
     @Override
     public Comment findUserCommentById(Long userId, Long commentId) {
-        return commentRepository.findCommentByIdAndWriterId(userId, commentId);
+        return commentRepository.findCommentByIdAndWriterId(commentId, userId);
     }
 
     @Override
@@ -36,18 +36,26 @@ public class CommentPersistServiceImpl implements CommentPersistService {
     }
 
     @Override
-    public Page<Comment> getCommentsPublic(Boolean sort, int from, int size) {
-
-        if (sort) {
-            return commentRepository.findAllByState(StateComment.PUBLISHED,
-                    PageRequest.of(from, size, Sort.by("created").descending()));
+    public Page<Comment> getCommentsPublic(String[] sort, int from, int size) {
+        Sort sortS;
+        if (Sort.Direction.DESC.name().equals(sort[1])) {
+            sortS = Sort.by(Sort.Direction.DESC, sort[0]);
+        } else {
+            sortS = Sort.by(Sort.Direction.ASC, sort[0]);
         }
-        return commentRepository.findAllByState(StateComment.PUBLISHED,
-                PageRequest.of(from, size, Sort.by("created").ascending()));
+        var page = PageRequest.of(from, size, sortS);
+        return commentRepository.findAllByState(StateComment.PUBLISHED, page);
+
     }
 
     @Override
     public Optional<Comment> findCommentById(Long id) {
         return commentRepository.findById(id);
+    }
+
+    @Override
+    @Transactional
+    public Comment updateComment(Comment comment) {
+        return commentRepository.save(comment);
     }
 }

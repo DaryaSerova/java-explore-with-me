@@ -23,10 +23,10 @@ public interface CommentMapper {
     Comment toComment(CommentDto commentDto);
 
     @Mapping(target = "id", source = "comment.id")
-    CommentDto toCommentDto(Comment comment, UserShortDto userShort, EventShortDto eventShort);
+    CommentDto toCommentDto(Comment comment, UserShortDto writer, EventShortDto event);
 
     @Mapping(target = "writerId", source = "userId")
-    @Mapping(target = "eventId", source = "newCommentDto.eventId")
+    @Mapping(target = "eventId", source = "eventId")
     Comment toCommentWithUserIdAndEventId(Long userId, Long eventId, NewCommentDto newCommentDto);
 
     void mergeToComment(UpdateUserCommentDto userCommentDto, @MappingTarget Comment comment);

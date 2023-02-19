@@ -12,7 +12,7 @@ import ru.practicum.explore.comment.model.Comment;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    Comment findCommentByIdAndWriterId(Long userId, Long commentId);
+    Comment findCommentByIdAndWriterId(Long commentId, Long userId);
 
     @Query(value = "FROM Comment com WHERE com.state = :state ")
     Page<Comment> findAllByState(@Param("state") StateComment state, Pageable page);

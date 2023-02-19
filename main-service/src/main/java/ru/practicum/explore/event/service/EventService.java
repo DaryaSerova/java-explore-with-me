@@ -35,4 +35,5 @@ public interface EventService {
     void increment(Long eventId);
 
     void decrement(Long eventId);
+
 }

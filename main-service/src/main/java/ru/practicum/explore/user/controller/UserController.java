@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explore.comment.dto.CommentDto;
 import ru.practicum.explore.comment.dto.NewCommentDto;
+import ru.practicum.explore.comment.dto.UpdateUserCommentDto;
 import ru.practicum.explore.comment.service.CommentService;
 import ru.practicum.explore.event.dto.EventFullDto;
 import ru.practicum.explore.event.dto.EventShortDto;
@@ -106,20 +107,29 @@ public class UserController {
         return participationService.cancelRequest(userId, requestId);
     }
 
-    @PostMapping("/{userId}/events/{eventId}/comments")
+    @PostMapping("/{userId}/comments")
     @ResponseStatus(HttpStatus.CREATED)
     public CommentDto addComment(@PathVariable("userId") Long userId,
-                                 @PathVariable("eventId") Long eventId,
+                                 @RequestParam Long eventId,
                                  @RequestBody NewCommentDto newCommentDto) {
         log.info("Добавление комментария от текущего пользователя с id " + userId + " к событию с id " + eventId);
         return commentService.addComment(userId, eventId, newCommentDto);
     }
 
-    @DeleteMapping("/{userId}/events/{eventId}/comments/{commentId}")
+    @PatchMapping("/{userId}/comments/{commentId}")
+    @ResponseStatus(HttpStatus.OK)
+    public CommentDto updateComment(@PathVariable("userId") Long userId,
+                                    @PathVariable("commentId") Long commentId,
+                                    @RequestBody UpdateUserCommentDto userCommentDto) {
+        log.info("Изменение не опубликованного комментария текущего пользователя с id " + userId);
+        return commentService.updateComment(userId, commentId, userCommentDto);
+    }
+
+    @DeleteMapping("/{userId}/comments/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteComment(@PathVariable("userId") Long userId,
-                                    @PathVariable("eventId") Long eventId,
-                                    @PathVariable("commentId") Long commentId) {
+                              @RequestParam Long eventId,
+                              @PathVariable("commentId") Long commentId) {
         log.info("Удаление не опубликованного комментария от текущего пользователя с id " + userId +
                  " к событию с id " + eventId);
         commentService.deleteComment(userId, eventId, commentId);

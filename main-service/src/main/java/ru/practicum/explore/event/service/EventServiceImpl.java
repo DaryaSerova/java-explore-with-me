@@ -158,7 +158,7 @@ public class EventServiceImpl implements EventService {
 
         if (event == null) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Event with id = %eventId was not found", eventId));
+                          String.format("Event with id = %s was not found", eventId));
         }
 
         var eventUpdateDate = updateEventDto.getEventDate();
@@ -178,6 +178,7 @@ public class EventServiceImpl implements EventService {
             }
             eventMapper.mergeToEventAdmin(updateEventDto, event);
             event.setState(StateEvent.PUBLISHED);
+//            event.setPublishedOn(LocalDateTime.now());
 
             var category = categoryService.getCategoryById(event.getCategoryId());
             var user = userService.getUserShortById(event.getInitiatorId());

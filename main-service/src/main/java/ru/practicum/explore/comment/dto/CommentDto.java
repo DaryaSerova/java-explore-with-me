@@ -12,8 +12,6 @@ import ru.practicum.explore.comment.StateComment;
 import ru.practicum.explore.event.dto.EventShortDto;
 import ru.practicum.explore.user.dto.UserShortDto;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -43,6 +41,6 @@ public class CommentDto {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime created;
+    private LocalDateTime createdOn;
 
 }

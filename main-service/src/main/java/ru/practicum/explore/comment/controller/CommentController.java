@@ -20,7 +20,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("comments")
-    public List<CommentDto> getCommentsPublic(@RequestParam(required = false) Boolean sort,
+    public List<CommentDto> getCommentsPublic(@RequestParam(defaultValue = "id,desc") String[] sort,
                                               @RequestParam(required = false, value = "from", defaultValue = "0")
                                               @PositiveOrZero int from,
                                               @RequestParam(required = false, value = "size", defaultValue = "10")
@@ -31,8 +31,8 @@ public class CommentController {
 
     }
 
-    @GetMapping("comments/{id}")
-    public CommentDto getCommentPublicById(@PathVariable(name = "id") Long id) {
+    @GetMapping("comments/{commentId}")
+    public CommentDto getCommentPublicById(@PathVariable(name = "commentId") Long id) {
 
         log.info("Получение комментария с id = " + id);
         return commentService.getCommentPublicById(id);

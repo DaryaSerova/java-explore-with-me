@@ -32,10 +32,10 @@ public class Comment {
     @Enumerated(EnumType.STRING)
     private StateComment state;
 
-    private LocalDateTime created;
+    private LocalDateTime createdOn;
 
     @PrePersist
     protected void onCreate() {
-        created = LocalDateTime.now();
+        createdOn = LocalDateTime.now();
     }
 }

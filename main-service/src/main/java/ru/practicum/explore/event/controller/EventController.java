@@ -2,6 +2,7 @@ package ru.practicum.explore.event.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explore.event.dto.EventFullDto;
@@ -24,6 +25,7 @@ public class EventController {
     private final StatisticService statisticService;
 
     @GetMapping("events")
+    @ResponseStatus(HttpStatus.OK)
     public List<EventShortDto> getEventsPublic(@RequestParam(required = false) String text,
                                                @RequestParam(required = false) List<Long> categories,
                                                @RequestParam(required = false) Boolean paid,
@@ -38,8 +40,6 @@ public class EventController {
                                                @PositiveOrZero int size,
                                                HttpServletRequest request) {
 
-        statisticService.addHit(request);
-
         log.info("Получение опубликованных событий.");
         return eventService.getEventsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort,
                 from, size);
@@ -48,8 +48,6 @@ public class EventController {
 
     @GetMapping("events/{id}")
     public EventFullDto getEventPublicById(@PathVariable(name = "id") Long id, HttpServletRequest request) {
-
-        statisticService.addHit(request);
 
         log.info("Получение информации о событий с id = " + id);
         return eventService.getEventPublicById(id);

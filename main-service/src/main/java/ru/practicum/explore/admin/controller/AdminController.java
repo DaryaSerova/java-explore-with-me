@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explore.category.dto.CategoryDto;
 import ru.practicum.explore.category.dto.NewCategoryDto;
 import ru.practicum.explore.category.service.CategoryService;
+import ru.practicum.explore.comment.dto.CommentDto;
+import ru.practicum.explore.comment.dto.UpdateAdminCommentDto;
+import ru.practicum.explore.comment.service.CommentService;
 import ru.practicum.explore.compilation.dto.CompilationDto;
 import ru.practicum.explore.compilation.dto.NewCompilationDto;
 import ru.practicum.explore.compilation.dto.UpdateCompilationRequestDto;
@@ -34,6 +37,7 @@ public class AdminController {
     private final CategoryService categoryService;
     private final EventService eventService;
     private final CompilationService compilationService;
+    private final CommentService commentService;
 
     @GetMapping(value = "/users")
     public List<UserDto> getUsers(@RequestParam List<Long> ids,
@@ -124,6 +128,14 @@ public class AdminController {
         log.info("Обновление подборки событий с id: " + compId);
 
         return compilationService.updateCompilation(compId, updateCompilationDto);
+    }
+
+    @PatchMapping(value = "/comments/{commentId}")
+    public CommentDto updateCommentByAdmin(@RequestBody UpdateAdminCommentDto updateAdminComment,
+                                           @PathVariable("commentId") Long commentId) {
+        log.info("Модерация комментария и его статуса.");
+
+        return commentService.updateCommentByAdmin(updateAdminComment, commentId);
     }
 }
 
