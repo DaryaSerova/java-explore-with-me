@@ -11,6 +11,7 @@ import ru.practicum.explore.event.service.EventService;
 import ru.practicum.explore.statistic.StatisticService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class EventController {
                                                @RequestParam(required = false, value = "from", defaultValue = "0")
                                                @PositiveOrZero int from,
                                                @RequestParam(required = false, value = "size", defaultValue = "10")
-                                               @PositiveOrZero int size,
+                                               @Positive int size,
                                                HttpServletRequest request) {
 
         statisticService.addHit(request);

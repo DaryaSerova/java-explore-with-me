@@ -19,9 +19,6 @@ public interface CommentMapper {
 
     CommentDto toCommentDto(Comment comment);
 
-    @Mapping(target = "id", source = "commentDto.id")
-    Comment toComment(CommentDto commentDto);
-
     @Mapping(target = "id", source = "comment.id")
     CommentDto toCommentDto(Comment comment, UserShortDto writer, EventShortDto event);
 

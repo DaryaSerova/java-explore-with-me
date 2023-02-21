@@ -15,6 +15,7 @@ import ru.practicum.explore.comment.model.Comment;
 import ru.practicum.explore.event.StateEvent;
 import ru.practicum.explore.event.jpa.EventPersistService;
 import ru.practicum.explore.event.mapper.EventMapper;
+import ru.practicum.explore.event.service.EventService;
 import ru.practicum.explore.exceptions.ConflictException;
 import ru.practicum.explore.exceptions.NotFoundException;
 import ru.practicum.explore.user.service.UserService;
@@ -35,6 +36,8 @@ public class CommentServiceImpl implements CommentService {
 
     private final EventPersistService eventPersistService;
 
+    private final EventService eventService;
+
     private final UserService userService;
 
     private final CategoryService categoryService;
@@ -52,7 +55,7 @@ public class CommentServiceImpl implements CommentService {
 
         var event = eventOpt.get();
 
-        if (event != null && !event.getState().equals(StateEvent.PUBLISHED)) {
+        if (!StateEvent.PUBLISHED.equals(event.getState())) {
             throw new ConflictException("For the requested operation the conditions are not met.",
                                         "Cannot publish the event because it's not in the right state: " +
                                         "PENDING or CANCELED");
@@ -76,7 +79,7 @@ public class CommentServiceImpl implements CommentService {
 
         var comment = findUserCommentById(userId, commentId);
 
-        if (comment.getState().equals(StateComment.PUBLISHED)) {
+        if (StateComment.PUBLISHED.equals(comment.getState())) {
             throw new ConflictException("For the requested operation the conditions are not met.",
                        "Cannot delete the comment because it's not in the right state: PUBLISHED");
         } else {
@@ -93,16 +96,12 @@ public class CommentServiceImpl implements CommentService {
             return Collections.emptyList();
         }
 
-        var commentsList = comments.stream()
+        return comments.stream()
                 .map(comment -> {
                     var userShort = userService.getUserShortById(comment.getWriterId());
-                    var event = eventPersistService.findEventById(comment.getEventId()).get();
-                    var categoryDto = categoryService.getCategoryById(event.getCategoryId());
-                    var eventShort = eventMapper.toEventShortDto(event, categoryDto, userShort);
+                    var eventShort = eventService.findEventShortById(comment.getEventId());
                     return commentMapper.toCommentDto(comment, userShort, eventShort);
                 }).collect(Collectors.toList());
-
-        return commentsList;
     }
 
     @Override
@@ -116,17 +115,15 @@ public class CommentServiceImpl implements CommentService {
         }
         var comment = commentOpt.get();
 
-        if (!comment.getState().equals(StateComment.PUBLISHED)) {
+        if (!StateComment.PUBLISHED.equals(comment.getState())) {
             throw new ConflictException("For the requested operation the conditions are not met.",
                       "Cannot delete the comment because it's not in the right state: PENDING or CANCELED.");
         }
 
-        var user = userService.getUserShortById(comment.getWriterId());
-        var event = eventPersistService.findEventById(comment.getEventId()).get();
-        var category = categoryService.getCategoryById(event.getCategoryId());
-        var eventResult = eventMapper.toEventShortDto(event, category, user);
+        var userShort = userService.getUserShortById(comment.getWriterId());
+        var eventShort = eventService.findEventShortById(comment.getEventId());
 
-        return commentMapper.toCommentDto(comment, user, eventResult);
+        return commentMapper.toCommentDto(comment, userShort, eventShort);
     }
 
     @Override
@@ -135,7 +132,7 @@ public class CommentServiceImpl implements CommentService {
         var comment = commentPersistService.findUserCommentById(userId, commentId);
         var stateComment = comment.getState();
 
-        if (stateComment.equals(StateComment.PUBLISHED)) {
+        if (StateComment.PUBLISHED.equals(stateComment)) {
             throw new ConflictException("For the requested operation the conditions are not met.",
                                         "Only pending or canceled comment can be changed");
         }
@@ -146,27 +143,27 @@ public class CommentServiceImpl implements CommentService {
 
         commentPersistService.updateComment(comment);
 
-        var user = userService.getUserShortById(comment.getWriterId());
-        var event = eventPersistService.findEventById(comment.getEventId()).get();
-        var category = categoryService.getCategoryById(event.getCategoryId());
-        var eventResult = eventMapper.toEventShortDto(event, category, user);
+        var userShort = userService.getUserShortById(comment.getWriterId());
+        var eventShort = eventService.findEventShortById(comment.getEventId());
 
-        return commentMapper.toCommentDto(comment, user, eventResult);
+        return commentMapper.toCommentDto(comment, userShort, eventShort);
     }
 
     @Override
     public CommentDto updateCommentByAdmin(UpdateAdminCommentDto updateAdminComment, Long commentId) {
 
-        var comment = commentPersistService.findCommentById(commentId).get();
+        var commentOpt = commentPersistService.findCommentById(commentId);
 
-        if (comment == null) {
+        if (commentOpt.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
                       String.format("Comment with id = %s was not found", commentId));
         }
 
-        if (updateAdminComment.getStateAction().equals(StateAction.PUBLISH_COMMENT)) {
+        var comment = commentOpt.get();
 
-            if (comment.getState().equals(StateComment.PUBLISHED) || comment.getState().equals(StateComment.CANCELED)) {
+        if (StateAction.PUBLISH_COMMENT.equals(updateAdminComment.getStateAction())) {
+
+            if (StateComment.PUBLISHED.equals(comment.getState()) || StateComment.CANCELED.equals(comment.getState())) {
                 throw new ConflictException("For the requested operation the conditions are not met.",
                           "Cannot publish the comment because it's not in the right state: PUBLISHED");
             }
@@ -176,17 +173,15 @@ public class CommentServiceImpl implements CommentService {
             comment.setState(StateComment.PUBLISHED);
             commentPersistService.updateComment(comment);
 
-            var user = userService.getUserShortById(comment.getWriterId());
-            var event = eventPersistService.findEventById(comment.getEventId()).get();
-            var category = categoryService.getCategoryById(event.getCategoryId());
-            var eventResult = eventMapper.toEventShortDto(event, category, user);
+            var userShort = userService.getUserShortById(comment.getWriterId());
+            var eventShort = eventService.findEventShortById(comment.getEventId());
 
-            return commentMapper.toCommentDto(comment, user, eventResult);
+            return commentMapper.toCommentDto(comment, userShort, eventShort);
         }
 
-        if (updateAdminComment.getStateAction().equals(StateAction.REJECT_COMMENT)) {
+        if (StateAction.REJECT_COMMENT.equals(updateAdminComment.getStateAction())) {
 
-            if (comment.getState().equals(StateComment.PUBLISHED)) {
+            if (StateComment.PUBLISHED.equals(comment.getState())) {
                 throw new ConflictException("For the requested operation the conditions are not met.",
                           "Cannot publish the comment because it's not in the right state: PUBLISHED");
             }
@@ -195,12 +190,10 @@ public class CommentServiceImpl implements CommentService {
 
             commentPersistService.updateComment(comment);
 
-            var user = userService.getUserShortById(comment.getWriterId());
-            var event = eventPersistService.findEventById(comment.getEventId()).get();
-            var category = categoryService.getCategoryById(event.getCategoryId());
-            var eventResult = eventMapper.toEventShortDto(event, category, user);
+            var userShort = userService.getUserShortById(comment.getWriterId());
+            var eventShort = eventService.findEventShortById(comment.getEventId());
 
-            return commentMapper.toCommentDto(comment, user, eventResult);
+            return commentMapper.toCommentDto(comment, userShort, eventShort);
         }
 
         throw new ConflictException("For the requested operation the conditions are not met.",
@@ -211,7 +204,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto findUserCommentById(Long userId, Long commentId) {
 
         var comment = commentMapper.toCommentDto(
-                commentPersistService.findUserCommentById(userId, commentId));
+                                  commentPersistService.findUserCommentById(userId, commentId));
         if (comment == null) {
             throw new NotFoundException("The required object was not found.",
                       String.format("Comment with id = %s was not found", commentId));
@@ -223,14 +216,20 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto findCommentById(Long id) {
 
-        var comment = commentPersistService.findCommentById(id).get();
+        var commentOpt = commentPersistService.findCommentById(id);
 
-        var event = eventPersistService.findEventById(comment.getEventId()).get();
-        var categoryDto = categoryService.getCategoryById(event.getCategoryId());
-        var userShort = userService.getUserShortById(event.getInitiatorId());
-        var eventShort = eventMapper.toEventShortDto(event, categoryDto, userShort);
+        if (commentOpt.isPresent()) {
 
-        return commentMapper.toCommentDto(comment, userShort, eventShort);
+            var comment = commentOpt.get();
+            var eventShort = eventService.findEventShortById(comment.getEventId());
+            var userShort = userService.getUserShortById(comment.getWriterId());
+
+            return commentMapper.toCommentDto(comment, userShort, eventShort);
+        }
+
+        throw new NotFoundException("The required object was not found.",
+                  String.format("Event with id = %s was not found ", id));
+
     }
 
     private StateComment getStateComment(Comment comment, StateAction stateAction) {
@@ -243,7 +242,8 @@ public class CommentServiceImpl implements CommentService {
             case SEND_TO_REVIEW:
                 return StateComment.PENDING;
             default:
-                return comment.getState();
+                throw new ConflictException("For the requested operation the conditions are not met.",
+                               "Cannot publish the comment because it's not in the right stateAction");
 
         }
     }

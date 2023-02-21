@@ -18,6 +18,7 @@ import ru.practicum.explore.user.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         return participationPersistService.getEventParticipantsByEventId(eventId)
                 .stream()
-                .map(participationMapper::map)
+                .map(participationMapper::toParticipationDto)
                 .collect(Collectors.toList());
 
     }
@@ -67,9 +68,9 @@ public class ParticipationServiceImpl implements ParticipationService {
                     throw new BadRequestException("Incorrectly made request.", "Request must have status PENDING");
                 }
 
-                if (requestStatusUpdateRequestDto.getStatus().equals(REJECTED)) {
+                if (REJECTED.equals(requestStatusUpdateRequestDto.getStatus())) {
                     request.setStatus(REJECTED);
-                    result.getRejectedRequests().add(participationMapper.map(request));
+                    result.getRejectedRequests().add(participationMapper.toParticipationDto(request));
 
                 } else {
                     request.setStatus(getStatus(userId, eventId));
@@ -77,9 +78,9 @@ public class ParticipationServiceImpl implements ParticipationService {
 
                 request = participationPersistService.save(request);
 
-                if (request.getStatus().equals(CONFIRMED)) {
+                if (CONFIRMED.equals(request.getStatus())) {
                     eventService.increment(eventId);
-                    result.getConfirmedRequests().add(participationMapper.map(request));
+                    result.getConfirmedRequests().add(participationMapper.toParticipationDto(request));
                 }
             }
         });
@@ -99,7 +100,7 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         return participationPersistService.getEventParticipantsByUserId(userId)
                 .stream()
-                .map(participationMapper::map)
+                .map(participationMapper::toParticipationDto)
                 .collect(Collectors.toList());
     }
 
@@ -121,7 +122,7 @@ public class ParticipationServiceImpl implements ParticipationService {
         var event = eventService.findEventById(eventId);
 
 
-        if (event.getInitiator().getId().equals(userId) || !event.getState().equals(StateEvent.PUBLISHED)) {
+        if (event.getInitiator().getId().equals(userId) || !StateEvent.PUBLISHED.equals(event.getState())) {
             throw new ConflictException("Integrity constraint has been violated.",
                                         "could not execute statement; SQL [n/a]; constraint [uq_request]; " +
                                         "nested exception is org.hibernate.exception.ConstraintViolationException: " +
@@ -129,7 +130,7 @@ public class ParticipationServiceImpl implements ParticipationService {
         }
 
         if (event.getConfirmedRequests() != null &&
-                event.getConfirmedRequests().equals(event.getParticipantLimit())) {
+                Objects.equals(event.getConfirmedRequests(), event.getParticipantLimit())) {
             throw new ConflictException("For the requested operation the conditions are not met.",
                                         "The participant limit has been reached");
         }
@@ -146,29 +147,32 @@ public class ParticipationServiceImpl implements ParticipationService {
             newParticipation.setStatus(ParticipationStatus.PENDING);
         }
 
-        return participationMapper.map(participationPersistService.addParticipationRequest(newParticipation));
+        return participationMapper.toParticipationDto(
+               participationPersistService.addParticipationRequest(newParticipation));
 
     }
 
     @Override
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
 
-        var request = participationPersistService.getEventParticipantsById(requestId).get();
+        var requestOpt = participationPersistService.getEventParticipantsById(requestId);
 
-        if (request == null) {
+        if (requestOpt.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Request with id = %requestId was not found", requestId));
+                          String.format("Request with id = %s was not found", requestId));
         }
+
+        var request = requestOpt.get();
 
         request.setStatus(ParticipationStatus.CANCELED);
 
         request = participationPersistService.save(request);
 
-        if (request.getStatus().equals(REJECTED)) {
+        if (REJECTED.equals(request.getStatus())) {
             eventService.decrement(request.getEventId());
         }
 
-        return participationMapper.map(request);
+        return participationMapper.toParticipationDto(request);
 
     }
 

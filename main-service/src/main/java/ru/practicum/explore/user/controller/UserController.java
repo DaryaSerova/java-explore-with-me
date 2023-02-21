@@ -19,6 +19,7 @@ import ru.practicum.explore.participation.dto.EventRequestStatusUpdateResultDto;
 import ru.practicum.explore.participation.dto.ParticipationRequestDto;
 import ru.practicum.explore.participation.service.ParticipationService;
 
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class UserController {
     @GetMapping("/{userId}/events")
     public List<EventShortDto> getUserEvents(@PathVariable("userId") Long userId,
                                              @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-                                             @RequestParam(defaultValue = "10") @PositiveOrZero Integer size) {
+                                             @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("Получение событий текущего пользователя с id = " + userId);
         return eventService.getUserEvents(userId, from, size);
     }

@@ -16,10 +16,6 @@ import ru.practicum.explore.user.dto.UserShortDto;
         uses = {LocationMapper.class})
 public interface EventMapper {
 
-    Event toEvent(EventDto eventDto);
-
-    EventDto toEventDto(Event event);
-
     @Mapping(target = "id", source = "event.id")
     EventFullDto toFullEventDto(Event event, CategoryDto category,
                                 UserShortDto initiator, LocationDto location);

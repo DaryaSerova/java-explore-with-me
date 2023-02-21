@@ -21,15 +21,15 @@ public class LocationServiceImpl implements LocationService {
         var locationOpt = locationPersistService.findLocationById(id);
         if (locationOpt.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Location with id = %id was not found", id));
+                          String.format("Location with id = %s was not found", id));
         }
 
-        return locationMapper.map(locationOpt.get());
+        return locationMapper.toLocationDto(locationOpt.get());
     }
 
     @Override
     public LocationDto save(LocationDto locationDto) {
-        return locationMapper.map(locationPersistService
-                .save(locationMapper.map(locationDto)));
+        return locationMapper.toLocationDto(locationPersistService
+                .save(locationMapper.toLocation(locationDto)));
     }
 }

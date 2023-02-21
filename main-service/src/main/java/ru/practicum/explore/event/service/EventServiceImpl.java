@@ -39,7 +39,7 @@ public class EventServiceImpl implements EventService {
 
         var events = eventPersistService.findUserEvents(userId, from, size).getContent();
 
-        if (events == null || events.isEmpty()) {
+        if (events.isEmpty()) {
 
             return Collections.emptyList();
         }
@@ -85,7 +85,7 @@ public class EventServiceImpl implements EventService {
 
         if (event == null) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Event with id = %eventId was not found", eventId));
+                          String.format("Event with id = %s was not found", eventId));
         }
 
         var category = categoryService.getCategoryById(event.getCategoryId());
@@ -102,14 +102,14 @@ public class EventServiceImpl implements EventService {
         var stateEvent = event.getState();
         var updateEventDate = updateEventDto.getEventDate();
 
-        if (stateEvent.equals(StateEvent.PUBLISHED)) {
+        if (StateEvent.PUBLISHED.equals(stateEvent)) {
             throw new ConflictException("For the requested operation the conditions are not met.",
                                         "Only pending or canceled events can be changed");
         }
 
         if (event.getId() == null) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Event with id = %eventId was not found ", eventId));
+                          String.format("Event with id = %s was not found ", eventId));
         }
 
         if (updateEventDate != null && !updateEventDate.isAfter(LocalDateTime.now().plusHours(2))) {
@@ -126,9 +126,7 @@ public class EventServiceImpl implements EventService {
         var user = userService.getUserShortById(event.getInitiatorId());
         var location = locationService.getLocationById(event.getLocation().getId());
 
-        var resultEvent = eventMapper.toFullEventDto(
-                                      eventPersistService.updateEvent(event), category, user, location);
-        return resultEvent;
+        return eventMapper.toFullEventDto(eventPersistService.updateEvent(event), category, user, location);
     }
 
     @Override
@@ -154,12 +152,14 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto updateEventByAdmin(UpdateEventAdminRequestDto updateEventDto, Long eventId) {
 
-        var event = eventPersistService.findEventById(eventId).get();
+        var eventOpt = eventPersistService.findEventById(eventId);
 
-        if (event == null) {
+        if (eventOpt.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Event with id = %s was not found", eventId));
+                      String.format("Event with id = %s was not found", eventId));
         }
+
+        var event = eventOpt.get();
 
         var eventUpdateDate = updateEventDto.getEventDate();
         var createdOn = event.getCreatedOn();
@@ -170,27 +170,23 @@ public class EventServiceImpl implements EventService {
                                         "Value: " + createdOn);
         }
 
-        if (updateEventDto.getStateAction().equals(StateAction.PUBLISH_EVENT)) {
+        if (StateAction.PUBLISH_EVENT.equals(updateEventDto.getStateAction())) {
 
-            if (event.getState().equals(StateEvent.PUBLISHED) || event.getState().equals(StateEvent.CANCELED)) {
+            if (StateEvent.PUBLISHED.equals(event.getState()) || StateEvent.CANCELED.equals(event.getState())) {
                 throw new ConflictException("For the requested operation the conditions are not met.",
                                             "Cannot publish the event because it's not in the right state: PUBLISHED");
             }
             eventMapper.mergeToEventAdmin(updateEventDto, event);
             event.setState(StateEvent.PUBLISHED);
-//            event.setPublishedOn(LocalDateTime.now());
 
             var category = categoryService.getCategoryById(event.getCategoryId());
             var user = userService.getUserShortById(event.getInitiatorId());
             var location = locationService.getLocationById(event.getLocation().getId());
 
-            var resultEvent = eventMapper.toFullEventDto(eventPersistService.updateEvent(event),
-                    category, user, location);
-
-            return resultEvent;
+            return eventMapper.toFullEventDto(eventPersistService.updateEvent(event), category, user, location);
         }
 
-        if (updateEventDto.getStateAction().equals(StateAction.REJECT_EVENT)) {
+        if (StateAction.REJECT_EVENT.equals(updateEventDto.getStateAction())) {
             if (event.getState().equals(StateEvent.PUBLISHED)) {
                 throw new ConflictException("For the requested operation the conditions are not met.",
                                             "Cannot publish the event because it's not in the right state: PUBLISHED");
@@ -202,10 +198,7 @@ public class EventServiceImpl implements EventService {
             var user = userService.getUserShortById(event.getInitiatorId());
             var location = locationService.getLocationById(event.getLocation().getId());
 
-            var resultEvent = eventMapper.toFullEventDto(eventPersistService.updateEvent(event),
-                                                                     category, user, location);
-
-            return resultEvent;
+            return eventMapper.toFullEventDto(eventPersistService.updateEvent(event), category, user, location);
         }
 
         throw new ConflictException("For the requested operation the conditions are not met.",
@@ -233,15 +226,16 @@ public class EventServiceImpl implements EventService {
                 }).collect(Collectors.toList());
     }
 
+
     @Override
     public EventFullDto getEventPublicById(Long id) {
 
         var event = findEventById(id);
         if (event == null) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Event with id = %id was not found", id));
+                          String.format("Event with id = %s was not found", id));
         }
-        if (!event.getState().equals(StateEvent.PUBLISHED)) {
+        if (!StateEvent.PUBLISHED.equals(event.getState())) {
             return null;
         }
         return event;
@@ -250,39 +244,81 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto findEventById(Long eventId) {
 
-        var event = eventPersistService.findEventById(eventId).get();
+        var eventOpt = eventPersistService.findEventById(eventId);
 
-        var category = categoryService.getCategoryById(event.getCategoryId());
-        var user = userService.getUserShortById(event.getInitiatorId());
-        var location = locationService.getLocationById(event.getLocation().getId());
+        if (eventOpt.isPresent()) {
 
-        return eventMapper.toFullEventDto(event, category, user, location);
+            var event = eventOpt.get();
+            var category = categoryService.getCategoryById(event.getCategoryId());
+            var user = userService.getUserShortById(event.getInitiatorId());
+            var location = locationService.getLocationById(event.getLocation().getId());
+
+            return eventMapper.toFullEventDto(event, category, user, location);
+        }
+
+        throw new NotFoundException("The required object was not found.",
+                  String.format("Event with id = %s was not found", eventId));
+    }
+
+    @Override
+    public EventShortDto findEventShortById(Long eventId) {
+
+        var eventOpt = eventPersistService.findEventById(eventId);
+
+        if (eventOpt.isPresent()) {
+
+            var event = eventOpt.get();
+            var category = categoryService.getCategoryById(event.getCategoryId());
+            var user = userService.getUserShortById(event.getInitiatorId());
+
+            return eventMapper.toEventShortDto(event, category, user);
+        }
+
+        throw new NotFoundException("The required object was not found.",
+                  String.format("Event with id = %s was not found ", eventId));
 
     }
 
     @Override
     public void increment(Long eventId) {
 
-        var event = eventPersistService.findEventById(eventId).get();
-        var confirmedRequests =
-                event.getConfirmedRequests() == null ||
-                        event.getConfirmedRequests() == 0 ? 1
-                        : event.getConfirmedRequests() + 1;
-        event.setConfirmedRequests(confirmedRequests);
-        eventPersistService.saveEvent(event);
+        var eventOpt = eventPersistService.findEventById(eventId);
+
+        if (eventOpt.isPresent()) {
+
+            var event = eventOpt.get();
+
+            var confirmedRequests =
+                    event.getConfirmedRequests() == null ||
+                            event.getConfirmedRequests() == 0 ? 1
+                            : event.getConfirmedRequests() + 1;
+            event.setConfirmedRequests(confirmedRequests);
+            eventPersistService.saveEvent(event);
+        }
+
+        throw new NotFoundException("The required object was not found.",
+                  String.format("Event with id = %s was not found ", eventId));
     }
 
     @Override
     public void decrement(Long eventId) {
 
-        var event = eventPersistService.findEventById(eventId).get();
+        var eventOpt = eventPersistService.findEventById(eventId);
 
-        var confirmedRequests =
-                event.getConfirmedRequests() == null ||
-                        event.getConfirmedRequests() == 0 ? 0
-                        : event.getConfirmedRequests() - 1;
-        event.setConfirmedRequests(confirmedRequests);
-        eventPersistService.saveEvent(event);
+        if (eventOpt.isPresent()) {
+
+            var event = eventOpt.get();
+
+            var confirmedRequests =
+                    event.getConfirmedRequests() == null ||
+                            event.getConfirmedRequests() == 0 ? 0
+                            : event.getConfirmedRequests() - 1;
+            event.setConfirmedRequests(confirmedRequests);
+            eventPersistService.saveEvent(event);
+        }
+
+        throw new NotFoundException("The required object was not found.",
+                 String.format("Event with id = %s was not found ", eventId));
     }
 
 

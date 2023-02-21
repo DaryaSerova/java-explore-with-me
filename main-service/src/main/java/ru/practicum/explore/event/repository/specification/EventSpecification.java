@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.practicum.explore.event.DateFormatConstant.DATE_FORMAT;
 import static ru.practicum.explore.event.repository.specification.SpecificationUtils.*;
 
 public class EventSpecification {
@@ -35,13 +36,13 @@ public class EventSpecification {
 
         if (rangeStart != null) {
             LocalDateTime start = LocalDateTime.parse(URLDecoder.decode(rangeStart, StandardCharsets.UTF_8),
-                    DateTimeFormatter.ofPattern(("yyyy-MM-dd HH:mm:ss")));
+                    DateTimeFormatter.ofPattern((DATE_FORMAT)));
             specifications.add(greaterThanOrEqualTo(Event_.eventDate, start));
         }
 
         if (rangeEnd != null) {
             LocalDateTime end = LocalDateTime.parse(URLDecoder.decode(rangeEnd, StandardCharsets.UTF_8),
-                    DateTimeFormatter.ofPattern(("yyyy-MM-dd HH:mm:ss")));
+                    DateTimeFormatter.ofPattern((DATE_FORMAT)));
             specifications.add(lessThanOrEqualTo(Event_.eventDate, end));
         }
         return and(specifications);
@@ -56,7 +57,7 @@ public class EventSpecification {
         }
         if (rangeStart != null) {
             LocalDateTime start = LocalDateTime.parse(URLDecoder.decode(rangeStart, StandardCharsets.UTF_8),
-                    DateTimeFormatter.ofPattern(("yyyy-MM-dd HH:mm:ss")));
+                    DateTimeFormatter.ofPattern((DATE_FORMAT)));
             specifications.add(greaterThanOrEqualTo(Event_.eventDate, start));
         } else {
             specifications.add(greaterThanOrEqualTo(Event_.eventDate, LocalDateTime.now()));
@@ -64,7 +65,7 @@ public class EventSpecification {
 
         if (rangeEnd != null) {
             LocalDateTime end = LocalDateTime.parse(URLDecoder.decode(rangeEnd, StandardCharsets.UTF_8),
-                    DateTimeFormatter.ofPattern(("yyyy-MM-dd HH:mm:ss")));
+                    DateTimeFormatter.ofPattern((DATE_FORMAT)));
             specifications.add(lessThanOrEqualTo(Event_.eventDate, end));
         }
 

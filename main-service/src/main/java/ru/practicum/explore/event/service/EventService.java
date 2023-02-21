@@ -32,6 +32,8 @@ public interface EventService {
 
     EventFullDto getEventPublicById(Long id);
 
+    EventShortDto findEventShortById(Long eventId);
+
     void increment(Long eventId);
 
     void decrement(Long eventId);

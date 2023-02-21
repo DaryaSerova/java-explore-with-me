@@ -12,5 +12,5 @@ public interface ParticipationMapper {
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "event", source = "eventId")
     @Mapping(target = "requester", source = "requesterId")
-    ParticipationRequestDto map(ParticipationRequest entity);
+    ParticipationRequestDto toParticipationDto(ParticipationRequest entity);
 }

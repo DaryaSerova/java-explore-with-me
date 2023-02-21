@@ -23,6 +23,7 @@ import ru.practicum.explore.user.dto.NewUserRequestDto;
 import ru.practicum.explore.user.dto.UserDto;
 import ru.practicum.explore.user.service.UserService;
 
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class AdminController {
                                   @RequestParam(value = "from", required = false, defaultValue = "0")
                                   @PositiveOrZero int from,
                                   @RequestParam(value = "size", required = false, defaultValue = "10")
-                                  @PositiveOrZero int size) {
+                                  @Positive int size) {
         log.info("Получение информации о пользователях.");
         return userService.getUsers(ids, from, size);
     }
@@ -93,7 +94,7 @@ public class AdminController {
                                             @RequestParam(value = "from", defaultValue = "0")
                                             @PositiveOrZero int from,
                                             @RequestParam(value = "size", defaultValue = "10")
-                                            @PositiveOrZero int size) {
+                                            @Positive int size) {
         log.info("Получение списка событий.");
         return eventService.getFullEvents(users, states, categories, rangeStart, rangeEnd, from, size);
     }
