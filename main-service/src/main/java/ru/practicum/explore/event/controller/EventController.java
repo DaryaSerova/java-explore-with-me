@@ -33,7 +33,7 @@ public class EventController {
                                                @RequestParam(required = false) String rangeStart,
                                                @RequestParam(required = false) String rangeEnd,
                                                @RequestParam(required = false, value = "onlyAvailable",
-                                                             defaultValue = "false") Boolean onlyAvailable,
+                                                       defaultValue = "false") Boolean onlyAvailable,
                                                @RequestParam(required = false) String sort,
                                                @RequestParam(required = false, value = "from", defaultValue = "0")
                                                @PositiveOrZero int from,

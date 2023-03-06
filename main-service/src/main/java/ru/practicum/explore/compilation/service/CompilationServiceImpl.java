@@ -15,7 +15,6 @@ import ru.practicum.explore.exceptions.ConflictException;
 import ru.practicum.explore.exceptions.NotFoundException;
 import ru.practicum.explore.user.service.UserService;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,14 +51,14 @@ public class CompilationServiceImpl implements CompilationService {
         var compilation = compilationPersistService.findCompilationById(compId);
         if (compilation.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                      String.format("Compilation with id = %s was not found", compId));
+                    String.format("Compilation with id = %s was not found", compId));
         }
 
         var events = compilation.get().getEvents()
                 .stream()
                 .map(event -> eventMapper.toEventShortDto(event,
-                              categoryService.getCategoryById(event.getCategoryId()),
-                              userService.getUserShortById(event.getInitiatorId()))
+                        categoryService.getCategoryById(event.getCategoryId()),
+                        userService.getUserShortById(event.getInitiatorId()))
                 ).collect(Collectors.toList());
 
         var compDto = compilationMapper.toCompilationDto(compilation.get());
@@ -80,9 +79,9 @@ public class CompilationServiceImpl implements CompilationService {
 
         if (comp.isPresent() && newCompilationDto.getTitle().equals(comp.get().getTitle())) {
             throw new ConflictException("Integrity constraint has been violated.",
-                                        "could not execute statement; SQL [n/a]; constraint [uq_compilation_title]; " +
-                                        "nested exception is org.hibernate.exception.ConstraintViolationException: " +
-                                        "could not execute statement");
+                    "could not execute statement; SQL [n/a]; constraint [uq_compilation_title]; " +
+                            "nested exception is org.hibernate.exception.ConstraintViolationException: " +
+                            "could not execute statement");
         }
 
         var compilationEntity = compilationMapper.toCompilation(newCompilationDto);
@@ -91,15 +90,15 @@ public class CompilationServiceImpl implements CompilationService {
         newCompilationDto.getEvents().forEach(eventId ->
                 compilationEntity.getEvents().add(eventPersistService.findEventById(eventId).orElseThrow(
                         () -> new NotFoundException("The required object was not found.",
-                        String.format("Event with id = %s was not found", eventId)))));
+                                String.format("Event with id = %s was not found", eventId)))));
 
         var compResult = compilationPersistService.addCompilation(compilationEntity);
 
         var events = compResult.getEvents()
                 .stream()
                 .map(event -> eventMapper.toEventShortDto(event,
-                              categoryService.getCategoryById(event.getCategoryId()),
-                              userService.getUserShortById(event.getInitiatorId()))
+                        categoryService.getCategoryById(event.getCategoryId()),
+                        userService.getUserShortById(event.getInitiatorId()))
                 ).collect(Collectors.toList());
 
         return compilationMapper.toCompilationDto(compResult);
@@ -119,7 +118,7 @@ public class CompilationServiceImpl implements CompilationService {
 
         if (compOpt.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Compilation with id = %s was not found", compId));
+                    String.format("Compilation with id = %s was not found", compId));
         }
 
         var comp = compOpt.get();
@@ -128,7 +127,7 @@ public class CompilationServiceImpl implements CompilationService {
                 .stream()
                 .map(ev -> eventPersistService.findEventById(ev).orElseThrow(
                         () -> new NotFoundException("The required object was not found.",
-                        String.format("Event with id = %s was not found", ev))))
+                                String.format("Event with id = %s was not found", ev))))
                 .collect(Collectors.toList());
 
         comp.setEvents(events);

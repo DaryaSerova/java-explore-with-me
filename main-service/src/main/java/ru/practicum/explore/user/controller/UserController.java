@@ -132,7 +132,7 @@ public class UserController {
                               @RequestParam Long eventId,
                               @PathVariable("commentId") Long commentId) {
         log.info("Удаление не опубликованного комментария от текущего пользователя с id " + userId +
-                 " к событию с id " + eventId);
+                " к событию с id " + eventId);
         commentService.deleteComment(userId, eventId, commentId);
     }
 }

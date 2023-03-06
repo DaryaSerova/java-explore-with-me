@@ -53,7 +53,7 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         if (event.getConfirmedRequests() != null && event.getConfirmedRequests().equals(event.getParticipantLimit())) {
             throw new ConflictException("For the requested operation the conditions are not met.",
-                                        "The participant limit has been reached");
+                    "The participant limit has been reached");
         }
 
         var result = new EventRequestStatusUpdateResultDto();
@@ -114,9 +114,9 @@ public class ParticipationServiceImpl implements ParticipationService {
                 participation.getRequesterId().equals(userId)
                 && participation.getEventId().equals(eventId)) {
             throw new ConflictException("Integrity constraint has been violated.",
-                                        "could not execute statement; SQL [n/a]; constraint [uq_request]; " +
-                                        "nested exception is org.hibernate.exception.ConstraintViolationException: " +
-                                        "could not execute statement");
+                    "could not execute statement; SQL [n/a]; constraint [uq_request]; " +
+                            "nested exception is org.hibernate.exception.ConstraintViolationException: " +
+                            "could not execute statement");
         }
 
         var event = eventService.findEventById(eventId);
@@ -124,15 +124,15 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         if (event.getInitiator().getId().equals(userId) || !StateEvent.PUBLISHED.equals(event.getState())) {
             throw new ConflictException("Integrity constraint has been violated.",
-                                        "could not execute statement; SQL [n/a]; constraint [uq_request]; " +
-                                        "nested exception is org.hibernate.exception.ConstraintViolationException: " +
-                                        "could not execute statement");
+                    "could not execute statement; SQL [n/a]; constraint [uq_request]; " +
+                            "nested exception is org.hibernate.exception.ConstraintViolationException: " +
+                            "could not execute statement");
         }
 
         if (event.getConfirmedRequests() != null &&
                 Objects.equals(event.getConfirmedRequests(), event.getParticipantLimit())) {
             throw new ConflictException("For the requested operation the conditions are not met.",
-                                        "The participant limit has been reached");
+                    "The participant limit has been reached");
         }
 
         ParticipationRequest newParticipation = new ParticipationRequest();
@@ -148,7 +148,7 @@ public class ParticipationServiceImpl implements ParticipationService {
         }
 
         return participationMapper.toParticipationDto(
-               participationPersistService.addParticipationRequest(newParticipation));
+                participationPersistService.addParticipationRequest(newParticipation));
 
     }
 
@@ -159,7 +159,7 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         if (requestOpt.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Request with id = %s was not found", requestId));
+                    String.format("Request with id = %s was not found", requestId));
         }
 
         var request = requestOpt.get();

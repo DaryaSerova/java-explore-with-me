@@ -21,7 +21,7 @@ public class LocationServiceImpl implements LocationService {
         var locationOpt = locationPersistService.findLocationById(id);
         if (locationOpt.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Location with id = %s was not found", id));
+                    String.format("Location with id = %s was not found", id));
         }
 
         return locationMapper.toLocationDto(locationOpt.get());

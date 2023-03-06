@@ -5,14 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.practicum.explore.admin.StateAction;
 import ru.practicum.explore.category.service.CategoryService;
 import ru.practicum.explore.event.StateEvent;
-import ru.practicum.explore.event.dto.EventFullDto;
-import ru.practicum.explore.event.dto.EventShortDto;
-import ru.practicum.explore.event.dto.NewEventDto;
-import ru.practicum.explore.event.dto.UpdateEventAdminRequestDto;
+import ru.practicum.explore.event.dto.*;
 import ru.practicum.explore.event.jpa.EventPersistService;
 import ru.practicum.explore.event.mapper.EventMapper;
 import ru.practicum.explore.event.model.Event;
-import ru.practicum.explore.event.dto.UpdateEventUserRequestDto;
 import ru.practicum.explore.exceptions.BadRequestException;
 import ru.practicum.explore.exceptions.ConflictException;
 import ru.practicum.explore.exceptions.NotFoundException;
@@ -232,7 +228,7 @@ public class EventServiceImpl implements EventService {
 
                     var stat =
                             statisticService.getViews("1900-01-01 00:00:00", end,
-                            List.of(request.getRequestURI() + "/" + event.getId()), true);
+                                    List.of(request.getRequestURI() + "/" + event.getId()), true);
                     var view = stat.isEmpty() ? 0 : stat.get(0).getHits();
                     event.setViews(view);
 
@@ -257,7 +253,7 @@ public class EventServiceImpl implements EventService {
         var end = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
 
         var stat = statisticService.getViews("1900-01-01 00:00:00", end,
-                                    List.of(request.getRequestURI() + "/" + event.getId()), true);
+                List.of(request.getRequestURI() + "/" + event.getId()), true);
 
         var view = stat.isEmpty() ? 0 : stat.get(0).getHits();
         event.setViews(view);

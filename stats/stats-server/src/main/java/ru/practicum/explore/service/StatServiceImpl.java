@@ -36,7 +36,7 @@ public class StatServiceImpl implements StatService {
         }
 
         return endpointHitMapper.toEndpointHitDto(statPersistService.addHit(
-               endpointHitMapper.toEndpointHit(endpointHitdto)));
+                endpointHitMapper.toEndpointHit(endpointHitdto)));
     }
 
     @Override

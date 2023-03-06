@@ -26,7 +26,7 @@ public class StatisticService {
         client.addHit(hitDto);
     }
 
-    public List<ViewStatsDto> getViews (String start, String end, List<String> uris, boolean unique) {
+    public List<ViewStatsDto> getViews(String start, String end, List<String> uris, boolean unique) {
 
         return client.getViewStats(start, end, uris, unique);
     }

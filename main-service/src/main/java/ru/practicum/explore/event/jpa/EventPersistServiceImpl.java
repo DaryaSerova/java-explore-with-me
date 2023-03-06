@@ -61,7 +61,7 @@ public class EventPersistServiceImpl implements EventPersistService {
                                      String rangeStart, String rangeEnd, int from, int size) {
 
         return eventRepository.findAll(EventSpecification.requestSpec(users, states, categories, rangeStart, rangeEnd),
-                                       PageRequest.of(from, size));
+                PageRequest.of(from, size));
     }
 
     @Override
@@ -73,11 +73,11 @@ public class EventPersistServiceImpl implements EventPersistService {
 
         if (sort != null && !sort.isEmpty()) {
             var sortD = Sort.by(SortState.EVENT_DATE.getField().equals(sort) ?
-                                      SortState.EVENT_DATE.getField() : SortState.VIEWS.getField());
+                    SortState.EVENT_DATE.getField() : SortState.VIEWS.getField());
             page.withSort(sortD);
         }
 
         return eventRepository.findAll(EventSpecification.requestSpec(text, categories, paid, rangeStart, rangeEnd,
-                                      onlyAvailable, StateEvent.PUBLISHED), page);
+                onlyAvailable, StateEvent.PUBLISHED), page);
     }
 }

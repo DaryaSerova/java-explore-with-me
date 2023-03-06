@@ -47,17 +47,17 @@ public class CommentServiceImpl implements CommentService {
 
         var eventOpt = eventPersistService.findEventById(eventId);
 
-         if (eventOpt.isEmpty()) {
+        if (eventOpt.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                      String.format("Event with id = %s was not found", eventId));
+                    String.format("Event with id = %s was not found", eventId));
         }
 
         var event = eventOpt.get();
 
         if (!StateEvent.PUBLISHED.equals(event.getState())) {
             throw new ConflictException("For the requested operation the conditions are not met.",
-                                        "Cannot publish the event because it's not in the right state: " +
-                                        "PENDING or CANCELED");
+                    "Cannot publish the event because it's not in the right state: " +
+                            "PENDING or CANCELED");
         }
 
         var comment = commentMapper.toCommentWithUserIdAndEventId(userId, eventId, newCommentDto);
@@ -80,7 +80,7 @@ public class CommentServiceImpl implements CommentService {
 
         if (StateComment.PUBLISHED.equals(comment.getState())) {
             throw new ConflictException("For the requested operation the conditions are not met.",
-                       "Cannot delete the comment because it's not in the right state: PUBLISHED");
+                    "Cannot delete the comment because it's not in the right state: PUBLISHED");
         } else {
             commentPersistService.deleteComment(commentId);
         }
@@ -110,13 +110,13 @@ public class CommentServiceImpl implements CommentService {
 
         if (commentOpt.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                      String.format("Comment with id = %s was not found", id));
+                    String.format("Comment with id = %s was not found", id));
         }
         var comment = commentOpt.get();
 
         if (!StateComment.PUBLISHED.equals(comment.getState())) {
             throw new ConflictException("For the requested operation the conditions are not met.",
-                      "Cannot delete the comment because it's not in the right state: PENDING or CANCELED.");
+                    "Cannot delete the comment because it's not in the right state: PENDING or CANCELED.");
         }
 
         var userShort = userService.getUserShortById(comment.getWriterId());
@@ -133,7 +133,7 @@ public class CommentServiceImpl implements CommentService {
 
         if (StateComment.PUBLISHED.equals(stateComment)) {
             throw new ConflictException("For the requested operation the conditions are not met.",
-                                        "Only pending or canceled comment can be changed");
+                    "Only pending or canceled comment can be changed");
         }
 
         commentMapper.mergeToComment(userCommentDto, comment);
@@ -155,7 +155,7 @@ public class CommentServiceImpl implements CommentService {
 
         if (commentOpt.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                      String.format("Comment with id = %s was not found", commentId));
+                    String.format("Comment with id = %s was not found", commentId));
         }
 
         var comment = commentOpt.get();
@@ -164,7 +164,7 @@ public class CommentServiceImpl implements CommentService {
 
             if (StateComment.PUBLISHED.equals(comment.getState()) || StateComment.CANCELED.equals(comment.getState())) {
                 throw new ConflictException("For the requested operation the conditions are not met.",
-                          "Cannot publish the comment because it's not in the right state: PUBLISHED");
+                        "Cannot publish the comment because it's not in the right state: PUBLISHED");
             }
 
             commentMapper.mergeToCommentAdmin(updateAdminComment, comment);
@@ -182,7 +182,7 @@ public class CommentServiceImpl implements CommentService {
 
             if (StateComment.PUBLISHED.equals(comment.getState())) {
                 throw new ConflictException("For the requested operation the conditions are not met.",
-                          "Cannot publish the comment because it's not in the right state: PUBLISHED");
+                        "Cannot publish the comment because it's not in the right state: PUBLISHED");
             }
             commentMapper.mergeToCommentAdmin(updateAdminComment, comment);
             comment.setState(StateComment.CANCELED);
@@ -196,17 +196,17 @@ public class CommentServiceImpl implements CommentService {
         }
 
         throw new ConflictException("For the requested operation the conditions are not met.",
-                  "Cannot publish the comment because it's not in the right state: PUBLISHED");
+                "Cannot publish the comment because it's not in the right state: PUBLISHED");
     }
 
     @Override
     public CommentDto findUserCommentById(Long userId, Long commentId) {
 
         var comment = commentMapper.toCommentDto(
-                                  commentPersistService.findUserCommentById(userId, commentId));
+                commentPersistService.findUserCommentById(userId, commentId));
         if (comment == null) {
             throw new NotFoundException("The required object was not found.",
-                      String.format("Comment with id = %s was not found", commentId));
+                    String.format("Comment with id = %s was not found", commentId));
         }
 
         return comment;
@@ -227,7 +227,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         throw new NotFoundException("The required object was not found.",
-                  String.format("Event with id = %s was not found ", id));
+                String.format("Event with id = %s was not found ", id));
 
     }
 
@@ -242,7 +242,7 @@ public class CommentServiceImpl implements CommentService {
                 return StateComment.PENDING;
             default:
                 throw new ConflictException("For the requested operation the conditions are not met.",
-                               "Cannot publish the comment because it's not in the right stateAction");
+                        "Cannot publish the comment because it's not in the right stateAction");
 
         }
     }
