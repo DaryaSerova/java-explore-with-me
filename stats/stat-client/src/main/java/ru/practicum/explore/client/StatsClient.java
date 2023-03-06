@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 import ru.practicum.explore.dto.EndpointHitDto;
 import ru.practicum.explore.dto.ViewStatsDto;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -33,7 +33,7 @@ public class StatsClient {
 
     public List<ViewStatsDto> getViewStats(String start, String end, List<String> uris, boolean unique) {
 
-        return Collections.singletonList(webClient
+        return Arrays.asList(webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/stats")
@@ -43,7 +43,8 @@ public class StatsClient {
                         .queryParam("unique", unique)
                         .build())
                 .retrieve()
-                .bodyToMono(ViewStatsDto.class)
+                .bodyToMono(ViewStatsDto[].class)
                 .block());
     }
+
 }

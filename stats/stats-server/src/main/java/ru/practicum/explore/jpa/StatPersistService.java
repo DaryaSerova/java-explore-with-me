@@ -11,4 +11,5 @@ public interface StatPersistService {
     EndpointHit addHit(EndpointHit endpointHit);
 
     List<ViewStats> getViewStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique);
+
 }

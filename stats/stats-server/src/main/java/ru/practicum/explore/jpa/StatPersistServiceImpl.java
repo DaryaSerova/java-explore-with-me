@@ -30,6 +30,7 @@ public class StatPersistServiceImpl implements StatPersistService {
         if (unique) {
             return statRepository.findAppBetweenStartAndEndByUriAndUniqueIp(start, end, uris);
         }
+
         return statRepository.findAppBetweenStartAndEndByUri(start, end, uris);
     }
 }

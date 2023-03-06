@@ -17,9 +17,12 @@ import ru.practicum.explore.exceptions.BadRequestException;
 import ru.practicum.explore.exceptions.ConflictException;
 import ru.practicum.explore.exceptions.NotFoundException;
 import ru.practicum.explore.location.service.LocationService;
+import ru.practicum.explore.statistic.StatisticService;
 import ru.practicum.explore.user.service.UserService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +36,8 @@ public class EventServiceImpl implements EventService {
     private final CategoryService categoryService;
     private final UserService userService;
     private final LocationService locationService;
+    private final StatisticService statisticService;
+
 
     @Override
     public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size) {
@@ -208,7 +213,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid,
                                                String rangeStart, String rangeEnd, Boolean onlyAvailable,
-                                               String sort, int from, int size) {
+                                               String sort, int from, int size, HttpServletRequest request) {
 
         var eventsPublic = eventPersistService.getEventsPublic(
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
@@ -218,19 +223,29 @@ public class EventServiceImpl implements EventService {
             return Collections.emptyList();
         }
 
+        var end = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
+
         return eventsPublic.stream()
                 .map(event -> {
                     var category = categoryService.getCategoryById(event.getCategoryId());
                     var user = userService.getUserShortById(event.getInitiatorId());
+
+                    var stat =
+                            statisticService.getViews("1900-01-01 00:00:00", end,
+                            List.of(request.getRequestURI() + "/" + event.getId()), true);
+                    var view = stat.isEmpty() ? 0 : stat.get(0).getHits();
+                    event.setViews(view);
+
+
                     return eventMapper.toEventShortDto(event, category, user);
                 }).collect(Collectors.toList());
     }
 
-
     @Override
-    public EventFullDto getEventPublicById(Long id) {
+    public EventFullDto getEventPublicById(Long id, HttpServletRequest request) {
 
         var event = findEventById(id);
+
         if (event == null) {
             throw new NotFoundException("The required object was not found.",
                     String.format("Event with id = %s was not found", id));
@@ -238,6 +253,15 @@ public class EventServiceImpl implements EventService {
         if (!StateEvent.PUBLISHED.equals(event.getState())) {
             return null;
         }
+
+        var end = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
+
+        var stat = statisticService.getViews("1900-01-01 00:00:00", end,
+                                    List.of(request.getRequestURI() + "/" + event.getId()), true);
+
+        var view = stat.isEmpty() ? 0 : stat.get(0).getHits();
+        event.setViews(view);
+
         return event;
     }
 
@@ -249,6 +273,7 @@ public class EventServiceImpl implements EventService {
         if (eventOpt.isPresent()) {
 
             var event = eventOpt.get();
+
             var category = categoryService.getCategoryById(event.getCategoryId());
             var user = userService.getUserShortById(event.getInitiatorId());
             var location = locationService.getLocationById(event.getLocation().getId());

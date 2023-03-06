@@ -36,7 +36,7 @@ public class StatServiceImpl implements StatService {
         }
 
         return endpointHitMapper.toEndpointHitDto(statPersistService.addHit(
-                endpointHitMapper.toEndpointHit(endpointHitdto)));
+               endpointHitMapper.toEndpointHit(endpointHitdto)));
     }
 
     @Override
@@ -49,12 +49,10 @@ public class StatServiceImpl implements StatService {
 
         var views = statPersistService.getViewStats(st, en, uris, unique);
 
-        List<ViewStatsDto> viewStatsDtos = views
+        return views
                 .stream()
                 .map(view -> viewStatsMapper.toViewStatsDto(view))
                 .collect(Collectors.toList());
-
-        return viewStatsDtos;
-
     }
+
 }

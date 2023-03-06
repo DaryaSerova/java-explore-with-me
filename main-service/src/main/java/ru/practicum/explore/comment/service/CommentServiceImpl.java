@@ -11,7 +11,6 @@ import ru.practicum.explore.comment.dto.UpdateAdminCommentDto;
 import ru.practicum.explore.comment.dto.UpdateUserCommentDto;
 import ru.practicum.explore.comment.jpa.CommentPersistService;
 import ru.practicum.explore.comment.mapper.CommentMapper;
-import ru.practicum.explore.comment.model.Comment;
 import ru.practicum.explore.event.StateEvent;
 import ru.practicum.explore.event.jpa.EventPersistService;
 import ru.practicum.explore.event.mapper.EventMapper;
@@ -138,7 +137,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentMapper.mergeToComment(userCommentDto, comment);
-        comment.setState(getStateComment(comment, userCommentDto.getStateAction()));
+        comment.setState(getStateComment(userCommentDto.getStateAction()));
         comment.setWriterId(userId);
 
         commentPersistService.updateComment(comment);
@@ -232,7 +231,7 @@ public class CommentServiceImpl implements CommentService {
 
     }
 
-    private StateComment getStateComment(Comment comment, StateAction stateAction) {
+    private StateComment getStateComment(StateAction stateAction) {
 
         switch (stateAction) {
             case CANCEL_REVIEW:

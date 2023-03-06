@@ -45,7 +45,7 @@ public class EventController {
 
         log.info("Получение опубликованных событий.");
         return eventService.getEventsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort,
-                from, size);
+                from, size, request);
 
     }
 
@@ -55,7 +55,7 @@ public class EventController {
         statisticService.addHit(request);
 
         log.info("Получение информации о событий с id = " + id);
-        return eventService.getEventPublicById(id);
+        return eventService.getEventPublicById(id, request);
 
     }
 }

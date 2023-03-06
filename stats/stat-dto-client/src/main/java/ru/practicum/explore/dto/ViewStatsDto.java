@@ -6,8 +6,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-@Getter
-@Setter
 public class ViewStatsDto {
 
     String app;

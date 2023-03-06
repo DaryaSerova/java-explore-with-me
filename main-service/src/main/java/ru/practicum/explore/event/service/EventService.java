@@ -7,6 +7,7 @@ import ru.practicum.explore.event.dto.NewEventDto;
 import ru.practicum.explore.event.dto.UpdateEventAdminRequestDto;
 import ru.practicum.explore.event.dto.UpdateEventUserRequestDto;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface EventService {
@@ -28,9 +29,9 @@ public interface EventService {
 
     List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid,
                                         String rangeStart, String rangeEnd, Boolean onlyAvailable,
-                                        String sort, int from, int size);
+                                        String sort, int from, int size, HttpServletRequest request);
 
-    EventFullDto getEventPublicById(Long id);
+    EventFullDto getEventPublicById(Long id, HttpServletRequest request);
 
     EventShortDto findEventShortById(Long eventId);
 
