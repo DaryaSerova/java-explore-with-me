@@ -9,7 +9,7 @@ import ru.practicum.explore.category.model.Category;
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
 
-    CategoryDto map(Category category);
+    CategoryDto toCategoryDto(Category category);
 
     CategoryDto mapToCategoryDto(Category category);
 

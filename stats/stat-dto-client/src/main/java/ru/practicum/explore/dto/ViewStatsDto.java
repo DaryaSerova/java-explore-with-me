@@ -1,13 +1,14 @@
 package ru.practicum.explore.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-@Getter
-@Setter
 public class ViewStatsDto {
 
     String app;

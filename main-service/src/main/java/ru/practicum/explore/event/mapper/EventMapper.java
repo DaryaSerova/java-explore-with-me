@@ -7,7 +7,6 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.practicum.explore.category.dto.CategoryDto;
 import ru.practicum.explore.event.dto.*;
 import ru.practicum.explore.event.model.Event;
-import ru.practicum.explore.event.dto.UpdateEventUserRequestDto;
 import ru.practicum.explore.location.dto.LocationDto;
 import ru.practicum.explore.location.mapper.LocationMapper;
 import ru.practicum.explore.user.dto.UserShortDto;
@@ -15,10 +14,6 @@ import ru.practicum.explore.user.dto.UserShortDto;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         uses = {LocationMapper.class})
 public interface EventMapper {
-
-    Event toEvent(EventDto eventDto);
-
-    EventDto toEventDto(Event event);
 
     @Mapping(target = "id", source = "event.id")
     EventFullDto toFullEventDto(Event event, CategoryDto category,

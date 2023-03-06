@@ -24,6 +24,7 @@ public interface StatRepository extends JpaRepository<EndpointHit, Integer> {
                                                    @Param("end") LocalDateTime end,
                                                    @Param("uris") List<String> uris);
 
+
     @Query(value = "SELECT new ru.practicum.explore.model.ViewStats(" +
             "st.app as app, st.uri as uri, COUNT(DISTINCT st.ip) as hits) " +
             "FROM EndpointHit st " +
@@ -34,4 +35,5 @@ public interface StatRepository extends JpaRepository<EndpointHit, Integer> {
     List<ViewStats> findAppBetweenStartAndEndByUriAndUniqueIp(@Param("start") LocalDateTime start,
                                                               @Param("end") LocalDateTime end,
                                                               @Param("uris") List<String> uris);
+
 }

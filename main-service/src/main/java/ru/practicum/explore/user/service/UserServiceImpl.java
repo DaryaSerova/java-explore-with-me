@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import ru.practicum.explore.event.mapper.EventMapper;
 import ru.practicum.explore.exceptions.BadRequestException;
 import ru.practicum.explore.exceptions.ConflictException;
 import ru.practicum.explore.exceptions.NotFoundException;
@@ -28,16 +27,14 @@ public class UserServiceImpl implements UserService {
 
     private final UserPersistService userPersistService;
     private final UserMapper userMapper;
-
-    private final EventMapper eventMapper;
-    private Pattern emailPattern = Pattern.compile("^.+@.+\\..+$");
+    private final Pattern emailPattern = Pattern.compile("^.+@.+\\..+$");
 
     @Override
     public List<UserDto> getUsers(List<Long> ids, int from, int size) {
 
         var users = userPersistService.getUsers(ids, from, size).getContent();
 
-        if (users == null || users.isEmpty()) {
+        if (users.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -47,7 +44,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(NewUserRequestDto newUserRequestDto) {
-
 
         if (newUserRequestDto.getName() == null) {
             throw new BadRequestException("Bad request body", "User name is empty");
@@ -60,9 +56,9 @@ public class UserServiceImpl implements UserService {
 
         if (!emailPattern.matcher(user.getEmail()).matches()) {
             throw new ConflictException("Integrity constraint has been violated.",
-                                        "could not execute statement; SQL [n/a]; constraint [uq_email]; " +
-                                        "nested exception is org.hibernate.exception.ConstraintViolationException: " +
-                                        "could not execute statement");
+                    "could not execute statement; SQL [n/a]; constraint [uq_email]; " +
+                            "nested exception is org.hibernate.exception.ConstraintViolationException: " +
+                            "could not execute statement");
         }
 
         userPersistService.createUser(user);
@@ -85,7 +81,7 @@ public class UserServiceImpl implements UserService {
 
         if (user.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("User with id = %id was not found.", id));
+                    String.format("User with id = %s was not found.", id));
         }
 
         return userMapper.toUserShortDto(user.get());

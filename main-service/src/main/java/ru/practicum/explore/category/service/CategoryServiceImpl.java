@@ -11,7 +11,6 @@ import ru.practicum.explore.exceptions.BadRequestException;
 import ru.practicum.explore.exceptions.ConflictException;
 import ru.practicum.explore.exceptions.NotFoundException;
 
-import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,12 +26,12 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryDto> getCategories(Integer from, Integer size) {
         var categories = categoryPersistService.findCategories(from, size).getContent();
 
-        if (categories == null || categories.isEmpty()) {
+        if (categories.isEmpty()) {
             return Collections.emptyList();
         }
 
         return categories.stream()
-                .map(category -> categoryMapper.map(category)).collect(Collectors.toList());
+                .map(categoryMapper::toCategoryDto).collect(Collectors.toList());
     }
 
     public CategoryDto getCategoryById(Long catId) {
@@ -41,12 +40,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (category.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Category with %s was not found",catId));
+                    String.format("Category with %s was not found", catId));
         }
 
-        var categoryResult = category.get();
-
-        return categoryMapper.map(categoryResult);
+        return categoryMapper.toCategoryDto(category.get());
     }
 
     @Override
@@ -59,16 +56,16 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (cat != null && cat.getName().equals(newCategoryDto.getName())) {
             throw new ConflictException("Integrity constraint has been violated.",
-                                        "could not execute statement; SQL [n/a]; constraint [uq_category_name]; " +
-                                        "nested exception is org.hibernate.exception.ConstraintViolationException: " +
-                                        "could not execute statement");
+                    "could not execute statement; SQL [n/a]; constraint [uq_category_name]; " +
+                            "nested exception is org.hibernate.exception.ConstraintViolationException: " +
+                            "could not execute statement");
         }
 
         categoryMapper.toMapCategory(newCategoryDto);
 
         var category = categoryPersistService.addCategory(categoryMapper.toMapCategory(newCategoryDto));
 
-        return categoryMapper.map(category);
+        return categoryMapper.toCategoryDto(category);
     }
 
     @Override
@@ -78,12 +75,12 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (category.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Category with %s was not found", catId));
+                    String.format("Category with %s was not found", catId));
         }
 
         if (category.get().getEvents() != null && category.get().getEvents().size() > 0) {
             throw new ConflictException("For the requested operation the conditions are not met.",
-                                        "The category is not empty");
+                    "The category is not empty");
         }
 
         categoryPersistService.deleteCategory(catId);
@@ -100,16 +97,19 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (cat != null && cat.getName().equals(categoryDto.getName())) {
             throw new ConflictException("Integrity constraint has been violated.",
-                                        "could not execute statement; SQL [n/a]; constraint [uq_category_name]; " +
-                                        "nested exception is org.hibernate.exception.ConstraintViolationException: " +
-                                        "could not execute statement");
+                    "could not execute statement; SQL [n/a]; constraint [uq_category_name]; " +
+                            "nested exception is org.hibernate.exception.ConstraintViolationException: " +
+                            "could not execute statement");
         }
 
-        var category = categoryPersistService.findCategoryById(catId).get();
-        if (category == null) {
+        var categoryOpt = categoryPersistService.findCategoryById(catId);
+
+        if (categoryOpt.isEmpty()) {
             throw new NotFoundException("The required object was not found.",
-                          String.format("Category with %s was not found", catId));
+                    String.format("Category with %s was not found", catId));
         }
+
+        var category = categoryOpt.get();
 
         category.setName(categoryDto.getName());
 

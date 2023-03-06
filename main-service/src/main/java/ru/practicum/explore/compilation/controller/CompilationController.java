@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explore.compilation.dto.CompilationDto;
 import ru.practicum.explore.compilation.service.CompilationService;
 
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class CompilationController {
     @GetMapping("compilations")
     public List<CompilationDto> getCompilation(@RequestParam(required = false) Boolean pinned,
                                                @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-                                               @RequestParam(defaultValue = "10") @PositiveOrZero Integer size) {
+                                               @RequestParam(defaultValue = "10") @Positive Integer size) {
 
         log.info("Получение подборок событий.");
 
