@@ -91,4 +91,5 @@ Explore with me (англ. «исследуй со мной») - это афиш
   ![](https://github.com/DaryaSerova/java-explore-with-me/blob/feature_comments/db%20-%20explore%20with%20me%20-%20statistic%20service.png)
   
   
-  PR feature https://github.com/DaryaSerova/java-explore-with-me/pull/3
+  PR feature 
+  https://github.com/DaryaSerova/java-explore-with-me/pull/3
